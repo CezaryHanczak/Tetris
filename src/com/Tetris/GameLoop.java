@@ -7,6 +7,7 @@ public class GameLoop
     private int level;
     private int lines;
     private int round_time;
+    private Tetrimino active_tetrimino;
 
     public GameLoop()
     {
@@ -20,6 +21,7 @@ public class GameLoop
     {
         while(true)
         {
+
             try
             {
                 Thread.sleep(this.round_time);
@@ -45,5 +47,10 @@ public class GameLoop
     public int getLines()
     {
         return this.level;
+    }
+
+    public Tetrimino getActive_tetrimino()
+    {
+        return this.active_tetrimino;
     }
 }
