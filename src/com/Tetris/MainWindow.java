@@ -11,6 +11,14 @@ public class MainWindow extends JPanel
     private Thread gameThread;
     private GameLoop game;
 
+    private int width;
+    private int center_x;
+    private int center_y;
+    private int arcs;
+    private int matrix_block_size;
+    private int matrix_height;
+    private int matrix_width;
+
     public MainWindow(GameLoop game)
     {
         this.game = game;
@@ -22,17 +30,36 @@ public class MainWindow extends JPanel
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
+
+        width = getWidth();
+        center_x = width/2;
+        center_y = getHeight()/2;
+        arcs = (int)(getHeight() * 0.01);
+
+        matrix_height = (int)(0.8 * getHeight());
+        matrix_width = (int)(0.6 * matrix_height);
+
+        matrix_block_size = matrix_width / 12;
+
         drawLayout(g);
+        drawBlocks(g);
         Toolkit.getDefaultToolkit().sync();
+    }
+
+    private void drawBlocks(Graphics g)
+    {
+        Graphics2D g2d = (Graphics2D) g;
+        int block_pos_x = (center_x - matrix_width / 2) + matrix_block_size;
+        int block_pos_y = (center_y - matrix_height / 2) + matrix_block_size;
+
+        g2d.setColor(Color.getHSBColor((float)0.5, 1, 1));
+        g2d.fillRoundRect(block_pos_x, block_pos_y, matrix_block_size, matrix_block_size, arcs, arcs);
+        g2d.setColor(Color.getHSBColor((float)0.5, (float)0.6, (float)0.4));
+        g2d.drawRoundRect(block_pos_x, block_pos_y, matrix_block_size, matrix_block_size, arcs, arcs);
     }
 
     private void drawLayout(Graphics g)
     {
-        int width = getWidth();
-        int center_x = width/2;
-        int center_y = getHeight()/2;
-        int arcs = (int)(getHeight() * 0.01);
-
         Graphics2D g2d = (Graphics2D) g;
 
         RenderingHints rh = new RenderingHints(
@@ -40,14 +67,8 @@ public class MainWindow extends JPanel
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g2d.setRenderingHints(rh);
 
-
-        int matrix_height = (int)(0.8 * getHeight());
-        int matrix_width = (int)(0.6 * matrix_height);
-
-        int matrix_block_size = matrix_width / 12;
         int block_pos_x = (center_x - matrix_width / 2);
         int block_pos_y = (center_y - matrix_height / 2);
-
 
         //Matrix rendering
         g2d.setStroke(new BasicStroke(2));
@@ -73,7 +94,7 @@ public class MainWindow extends JPanel
 
         //Fonts
         g2d.setColor(Color.GRAY);
-        Font font = new Font("Bauhaus 93", Font.PLAIN, (int)(width * 0.022));
+        Font font = new Font("Bauhaus 93", 0, (int)(width * 0.022));
         g2d.setFont(font);
 
         //Score box text generate
@@ -88,7 +109,7 @@ public class MainWindow extends JPanel
         g2d.drawString(level_text, block_pos_x - (int)(width * 0.22), block_pos_y + (int)(width * 0.11));
         g2d.drawString(lines_text, block_pos_x - (int)(width * 0.22), block_pos_y + (int)(width * 0.17));
 
-        //Next figures box
+        //Next figure box
         //g2d.drawRoundRect(block_pos_x + (12 * matrix_block_size) + (int)(width * 0.25 - width * 0.2), block_pos_y, (int)(width * 0.2), (int)(getHeight() * 0.6), arcs, arcs);
 
         //Font font = new Font("Verdana", Font.BOLD, (int)(getHeight() * 0.1));
@@ -111,9 +132,12 @@ public class MainWindow extends JPanel
         while (true)
         {
             repaint();
-            try {
+            try
+            {
                 Thread.sleep(2);
-            } catch (InterruptedException e) {
+            }
+            catch (InterruptedException e)
+            {
                 System.out.println("Animation Thread Error");
             }
         }
