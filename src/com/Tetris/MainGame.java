@@ -12,8 +12,8 @@ public class MainGame extends JFrame
 
     private void initUI()
     {
-        GameLoop game = new GameLoop();
-        add(new MainWindow(game));
+        GameLoop game = new GameLoop(12, 20);
+        add(new MainWindow(game, 12, 20));
         addKeyListener(new KeysEvents(game));
         setSize(650, 650);
         setTitle("Tetris");

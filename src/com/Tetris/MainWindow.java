@@ -11,6 +11,8 @@ public class MainWindow extends JPanel
     private Thread gameThread;
     private GameLoop game;
 
+    private final int size_x;
+    private final int size_y;
     private int width;
     private int center_x;
     private int center_y;
@@ -19,8 +21,10 @@ public class MainWindow extends JPanel
     private int matrix_height;
     private int matrix_width;
 
-    public MainWindow(GameLoop game)
+    public MainWindow(GameLoop game, int size_x, int size_y)
     {
+        this.size_x = size_x;
+        this.size_y = size_y;
         this.game = game;
         this.gameThread = new Thread(this.game);
         this.gameThread.start();
@@ -39,7 +43,7 @@ public class MainWindow extends JPanel
         matrix_height = (int)(0.8 * getHeight());
         matrix_width = (int)(0.6 * matrix_height);
 
-        matrix_block_size = matrix_width / 12;
+        matrix_block_size = matrix_width / size_x;
 
         drawLayout(g);
         drawBlocks(g);
@@ -49,13 +53,43 @@ public class MainWindow extends JPanel
     private void drawBlocks(Graphics g)
     {
         Graphics2D g2d = (Graphics2D) g;
+
+        RenderingHints rh = new RenderingHints(
+                RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2d.setRenderingHints(rh);
+        RenderingHints rh2 = new RenderingHints(
+                RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHints(rh2);
+
         int block_pos_x = (center_x - matrix_width / 2) + matrix_block_size;
         int block_pos_y = (center_y - matrix_height / 2) + matrix_block_size;
 
-        g2d.setColor(Color.getHSBColor((float)0.5, 1, 1));
-        g2d.fillRoundRect(block_pos_x, block_pos_y, matrix_block_size, matrix_block_size, arcs, arcs);
-        g2d.setColor(Color.getHSBColor((float)0.5, (float)0.6, (float)0.4));
-        g2d.drawRoundRect(block_pos_x, block_pos_y, matrix_block_size, matrix_block_size, arcs, arcs);
+        if(game.getActive())
+        {
+            Tetrimino active = game.getActive_tetrimino();
+            block_pos_x += active.getX() * matrix_block_size;
+            block_pos_y += active.getY() * matrix_block_size;
+            float color = active.getColor();
+
+            for(int y = 0; y < 5; y++)
+            {
+                for (int x = 0; x < 5; x++)
+                {
+                    if(active.block_matrix_cpy[x][y])
+                    {
+                        g2d.setColor(Color.getHSBColor(color, 1, 1));
+                        g2d.fillRoundRect(block_pos_x, block_pos_y, matrix_block_size, matrix_block_size, arcs, arcs);
+                        g2d.setColor(Color.getHSBColor(color, (float)0.6, (float)0.4));
+                        g2d.drawRoundRect(block_pos_x, block_pos_y, matrix_block_size, matrix_block_size, arcs, arcs);
+                    }
+                    block_pos_x += matrix_block_size;
+                }
+                block_pos_x -= matrix_block_size * 5;
+                block_pos_y += matrix_block_size;
+            }
+        }
     }
 
     private void drawLayout(Graphics g)
@@ -66,6 +100,10 @@ public class MainWindow extends JPanel
                 RenderingHints.KEY_TEXT_ANTIALIASING,
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g2d.setRenderingHints(rh);
+        RenderingHints rh2 = new RenderingHints(
+                RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHints(rh2);
 
         int block_pos_x = (center_x - matrix_width / 2);
         int block_pos_y = (center_y - matrix_height / 2);
@@ -75,20 +113,20 @@ public class MainWindow extends JPanel
         g2d.setColor(Color.black);
         g2d.fillRect(0,0, width, getHeight());
 
-        for (int i = 0; i < 65; i++)
+        for (int i = 0; i < size_x * 2 + size_y * 2 + 1; i++)
         {
             g2d.setColor(Color.getHSBColor((float)i / 64, 1, 1));
             g2d.fillRoundRect(block_pos_x, block_pos_y, matrix_block_size, matrix_block_size, arcs, arcs);
-            g2d.setColor(Color.getHSBColor((float)i / 64, (float)0.6, (float)0.4));
+            g2d.setColor(Color.getHSBColor((float)i / 64, (float)0.8, (float)0.4));
             g2d.drawRoundRect(block_pos_x, block_pos_y, matrix_block_size, matrix_block_size, arcs, arcs);
 
-            if(i > 0 && i < 12)
+            if(i > 0 && i < size_x)
                 block_pos_x += matrix_block_size;
-            else if (i >= 12 && i < 32)
+            else if (i >= size_x && i < size_x + size_y)
                 block_pos_y += matrix_block_size;
-            else if (i >= 34 && i < 45)
+            else if (i >= size_x + size_y && i < size_x * 2 + size_y - 1)
                 block_pos_x -= matrix_block_size;
-            else if (i >= 45)
+            else if (i >= size_x * 2 + size_y)
                 block_pos_y -= matrix_block_size;
         }
 

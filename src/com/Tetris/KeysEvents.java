@@ -20,7 +20,7 @@ public class KeysEvents implements KeyListener
     @Override
     public void keyPressed(KeyEvent e)
     {
-
+        game.keyPressed(e.getKeyCode());
     }
 
     @Override
