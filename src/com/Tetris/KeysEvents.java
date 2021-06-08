@@ -5,7 +5,7 @@ import java.awt.event.KeyListener;
 
 public class KeysEvents implements KeyListener
 {
-    private GameLoop game;
+    private final GameLoop game;
     public KeysEvents(GameLoop game)
     {
         this.game = game;

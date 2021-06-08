@@ -6,10 +6,9 @@ import java.awt.*;
 public class MainWindow extends JPanel
     implements Runnable
 {
-    private Timer timer;
     private Thread animator;
     private Thread gameThread;
-    private GameLoop game;
+    private final GameLoop game;
 
     private final int size_x;
     private final int size_y;
@@ -90,6 +89,7 @@ public class MainWindow extends JPanel
                 block_pos_y += matrix_block_size;
             }
         }
+
     }
 
     private void drawLayout(Graphics g)
@@ -148,12 +148,54 @@ public class MainWindow extends JPanel
         g2d.drawString(lines_text, block_pos_x - (int)(width * 0.22), block_pos_y + (int)(width * 0.17));
 
         //Next figure box
-        //g2d.drawRoundRect(block_pos_x + (12 * matrix_block_size) + (int)(width * 0.25 - width * 0.2), block_pos_y, (int)(width * 0.2), (int)(getHeight() * 0.6), arcs, arcs);
+        g2d.drawRoundRect(block_pos_x + (12 * matrix_block_size) + (int)(width * 0.05), block_pos_y, (int)(width * 0.2), (int)(width * 0.2), arcs, arcs);
+        font = new Font("Bauhaus 93", 0, (int)(width * 0.06));
+        g2d.setFont(font);
+        g2d.drawString("T e t r i s", center_x - (int)(width * 0.11), block_pos_y + (int)(width * 0.012));
+//
+        font = new Font("Bauhaus 93", 0, (int)(width * 0.022));
+        g2d.setFont(font);
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(block_pos_x + (12 * matrix_block_size) + (int)(width * 0.074), block_pos_y - (int)(width * 0.01), (int)(width * 0.156), (int)(width * 0.03));
+        g2d.setColor(Color.GRAY);
+        g2d.drawString("Next Tetrimino", block_pos_x + (12 * matrix_block_size) + (int)(width * 0.084), block_pos_y + (int)(width * 0.006));
 
-        //Font font = new Font("Verdana", Font.BOLD, (int)(getHeight() * 0.1));
-        //g2d.setFont(font);
-        //g2d.drawString("Tetris", 40, 40);
+        Tetrimino next = game.getNext_tetrimino();
+        float color = next.getColor();
 
+        float centerX = next.getCenterX();
+        if(centerX == -1)
+            centerX = (float)2;
+        else if (centerX >= 2)
+            centerX = (float)0.5;
+        else
+            centerX = (float)1.5;
+
+        float centerY = next.getCenterY();
+        if(centerY >= 2)
+            centerY = (float)0.5;
+        else if(centerY == -1)
+            centerY = (float)-0.6;
+        else
+            centerY = 0;
+
+        int next_block_size = (int)(width * 0.2 / 6);
+        for(int y = 0; y < 5; y++)
+        {
+            for (int x = 0; x < 5; x++)
+            {
+                if(next.block_matrix_cpy[x][y])
+                {
+                    g2d.setColor(Color.getHSBColor(color, 1, 1));
+                    g2d.fillRoundRect(block_pos_x + (12 * matrix_block_size) + (int)(width * 0.05) + (int)(centerX * next_block_size), block_pos_y + (int)(width * 0.05) - (int)(centerY * next_block_size), next_block_size, next_block_size, arcs, arcs);
+                    g2d.setColor(Color.getHSBColor(color, (float)0.6, (float)0.4));
+                    g2d.drawRoundRect(block_pos_x + (12 * matrix_block_size) + (int)(width * 0.05) + (int)(centerX * next_block_size), block_pos_y + (int)(width * 0.05) - (int)(centerY * next_block_size), next_block_size, next_block_size, arcs, arcs);
+                }
+                block_pos_x += next_block_size;
+            }
+            block_pos_x -= next_block_size * 5;
+            block_pos_y += next_block_size;
+        }
     }
 
     @Override

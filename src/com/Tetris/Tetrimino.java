@@ -12,7 +12,6 @@ public class Tetrimino
     private int x;
     private int y;
     private float color;
-    private boolean active;
 
     private int center_x;
     private int center_y;
@@ -23,7 +22,6 @@ public class Tetrimino
         block_matrix_cpy = new boolean[5][5];
         x = 4;
         y = 0;
-        active = true;
         clear();
         generateBlock();
     }
@@ -130,8 +128,6 @@ public class Tetrimino
     public void rotateLeft()
     {
         boolean[][] temp = new boolean[5][5];
-        int temp_x = center_x;
-        int temp_y = center_y;
 
         if(center_y != -1 && center_x != -1)
         {
@@ -182,6 +178,16 @@ public class Tetrimino
     public float getColor()
     {
         return color;
+    }
+
+    public int getCenterX()
+    {
+        return center_x;
+    }
+
+    public int getCenterY()
+    {
+        return center_y;
     }
 
 }

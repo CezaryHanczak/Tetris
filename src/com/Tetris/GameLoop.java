@@ -10,11 +10,14 @@ public class GameLoop
     private final int size_y;
     private int score;
     private int level;
+    private int new_level;
     private int lines;
     private int round_time;
     private boolean is_active;
     private long last_move;
+
     private Tetrimino active_tetrimino;
+    private Tetrimino next_tetrimino;
 
     public GameLoop(int size_x, int size_y)
     {
@@ -22,19 +25,23 @@ public class GameLoop
         this.size_y = size_y;
         this.score = 0;
         this.level = 1;
+        this.new_level = 9;
         this.lines = 0;
         this.round_time = 1000;
-        is_active = false;
+        this.is_active = false;
+        this.next_tetrimino = new Tetrimino();
     }
 
     public void run()
     {
         while(true)
         {
-            if(!is_active)
+            newLevel();
+            if(!this.is_active)
             {
-                active_tetrimino = new Tetrimino();
-                is_active = true;
+                this.active_tetrimino = this.next_tetrimino;
+                this.next_tetrimino = new Tetrimino();
+                this.is_active = true;
             }
 
             try
@@ -47,10 +54,10 @@ public class GameLoop
             }
 
             Date date = new Date();
-            if(date.getTime() - last_move >= round_time)
+            if(date.getTime() - this.last_move >= this.round_time)
             {
                 moveDown();
-                last_move = date.getTime();
+                this.last_move = date.getTime();
             }
         }
     }
@@ -111,14 +118,14 @@ public class GameLoop
                     {
                         if(active_tetrimino.block_matrix_cpy[x][y])
                         {
-                            if(active_tetrimino.getX() + x > size_x - 3)
+                            if(active_tetrimino.getX() + x >= size_x - 2)
                                 active_tetrimino.moveLeft();
                         }
                     }
                 }
                 for(int y = 0; y < 5; y++)
                 {
-                    for (int x = 0; x < 5; x++)
+                    for (int x = 4; x > 0; x--)
                     {
                         if(active_tetrimino.block_matrix_cpy[x][y])
                         {
@@ -140,12 +147,23 @@ public class GameLoop
         boolean check = checkCollision();
         if(check)
         {
-            is_active = false;
+            this.is_active = false;
         }
         else
         {
-            active_tetrimino.moveDown();
-            last_move = new Date().getTime();
+            this.active_tetrimino.moveDown();
+            this.last_move = new Date().getTime();
+        }
+    }
+
+    private void newLevel()
+    {
+        if(this.lines >= this.new_level)
+        {
+            this.new_level *= 2;
+            this.round_time /= 2;
+            this.score += 1000 * this.level;
+            ++this.level;
         }
     }
 
@@ -167,6 +185,11 @@ public class GameLoop
     public Tetrimino getActive_tetrimino()
     {
         return this.active_tetrimino;
+    }
+
+    public Tetrimino getNext_tetrimino()
+    {
+        return this.next_tetrimino;
     }
 
     public boolean getActive()
