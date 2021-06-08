@@ -1,7 +1,10 @@
 package com.Tetris;
 
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Date;
+
+import static java.lang.Math.abs;
 
 public class GameLoop
     implements Runnable
@@ -19,6 +22,8 @@ public class GameLoop
     private Tetrimino active_tetrimino;
     private Tetrimino next_tetrimino;
 
+    private ArrayList<Tetrimino> tetriminos;
+
     public GameLoop(int size_x, int size_y)
     {
         this.size_x = size_x;
@@ -30,6 +35,7 @@ public class GameLoop
         this.round_time = 1000;
         this.is_active = false;
         this.next_tetrimino = new Tetrimino();
+        this.tetriminos = new ArrayList<>();
     }
 
     public void run()
@@ -68,10 +74,99 @@ public class GameLoop
         {
             for (int x = 0; x < 5; x++)
             {
-                if(active_tetrimino.block_matrix_cpy[x][y])
+                if(this.active_tetrimino.block_matrix_cpy[x][y])
                 {
-                    if(active_tetrimino.getY() + y >= size_y - 2)
+                    if(this.active_tetrimino.getY() + y >= this.size_y - 2)
                         return true;
+
+                    for(int i = 0; i < this.tetriminos.size(); i++)
+                    {
+                        Tetrimino temp = this.tetriminos.get(i);
+
+                        for(int y_ = 0; y_ < 5; y_++)
+                        {
+                            for(int x_ = 0; x_ < 5; x_++)
+                            {
+                                if(temp.block_matrix_cpy[x_][y_])
+                                {
+                                    if(x + this.active_tetrimino.getX() == x_ + temp.getX() && y + this.active_tetrimino.getY() == y_ + temp.getY()  - 1)
+                                    {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkCollisionRight()
+    {
+        for(int y = 0; y < 5; y++)
+        {
+            for (int x = 0; x < 5; x++)
+            {
+                if(this.active_tetrimino.block_matrix_cpy[x][y])
+                {
+                    if(this.active_tetrimino.getY() + y >= this.size_y - 2)
+                        return true;
+
+                    for(int i = 0; i < this.tetriminos.size(); i++)
+                    {
+                        Tetrimino temp = this.tetriminos.get(i);
+
+                        for(int y_ = 0; y_ < 5; y_++)
+                        {
+                            for(int x_ = 0; x_ < 5; x_++)
+                            {
+                                if(temp.block_matrix_cpy[x_][y_])
+                                {
+                                    if(x + this.active_tetrimino.getX() == x_ + temp.getX() - 1 && y + this.active_tetrimino.getY() == y_ + temp.getY())
+                                    {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkCollisionLeft()
+    {
+        for(int y = 0; y < 5; y++)
+        {
+            for (int x = 0; x < 5; x++)
+            {
+                if(this.active_tetrimino.block_matrix_cpy[x][y])
+                {
+                    if(this.active_tetrimino.getY() + y >= this.size_y - 2)
+                        return true;
+
+                    for(int i = 0; i < this.tetriminos.size(); i++)
+                    {
+                        Tetrimino temp = this.tetriminos.get(i);
+
+                        for(int y_ = 0; y_ < 5; y_++)
+                        {
+                            for(int x_ = 0; x_ < 5; x_++)
+                            {
+                                if(temp.block_matrix_cpy[x_][y_])
+                                {
+                                    if(x + this.active_tetrimino.getX() - 1 == x_ + temp.getX() && y + this.active_tetrimino.getY() == y_ + temp.getY())
+                                    {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -80,30 +175,29 @@ public class GameLoop
 
     public void keyPressed(int keyCode)
     {
-        switch (keyCode)
-        {
+        switch (keyCode) {
             case KeyEvent.VK_RIGHT:
-                for(int y = 0; y < 5; y++)
+                for (int y = 0; y < 5; y++)
                 {
                     for (int x = 0; x < 5; x++)
                     {
-                        if(active_tetrimino.block_matrix_cpy[x][y])
+                        if (active_tetrimino.block_matrix_cpy[x][y])
                         {
-                            if(active_tetrimino.getX() + x >= size_x - 3)
-                               return;
+                            if (active_tetrimino.getX() + x >= size_x - 3 || checkCollisionRight())
+                                return;
                         }
                     }
                 }
                 active_tetrimino.moveRight();
                 break;
             case KeyEvent.VK_LEFT:
-                for(int y = 0; y < 5; y++)
+                for (int y = 0; y < 5; y++)
                 {
                     for (int x = 0; x < 5; x++)
                     {
-                        if(active_tetrimino.block_matrix_cpy[x][y])
+                        if (active_tetrimino.block_matrix_cpy[x][y])
                         {
-                            if(active_tetrimino.getX() + x <= 0)
+                            if (active_tetrimino.getX() + x <= 0 || checkCollisionLeft())
                                 return;
                         }
                     }
@@ -112,28 +206,56 @@ public class GameLoop
                 break;
             case KeyEvent.VK_UP:
                 active_tetrimino.rotateLeft();
-                for(int y = 0; y < 5; y++)
+                for (int y = 0; y < 5; y++)
                 {
                     for (int x = 0; x < 5; x++)
                     {
-                        if(active_tetrimino.block_matrix_cpy[x][y])
+                        if (active_tetrimino.block_matrix_cpy[x][y])
                         {
-                            if(active_tetrimino.getX() + x >= size_x - 2)
+                            if (active_tetrimino.getX() + x >= size_x - 2)
                                 active_tetrimino.moveLeft();
                         }
                     }
                 }
-                for(int y = 0; y < 5; y++)
+                boolean flag = false;
+                for (int y = 0; y < 5; y++)
                 {
                     for (int x = 4; x > 0; x--)
                     {
-                        if(active_tetrimino.block_matrix_cpy[x][y])
+                        if (active_tetrimino.block_matrix_cpy[x][y])
                         {
-                            if(active_tetrimino.getX() + x <= 0)
+                            if (active_tetrimino.getX() + x <= 0)
+                            {
+
                                 active_tetrimino.moveRight();
+                                flag = true;
+                            }
                         }
                     }
                 }
+
+                boolean flag2;
+                if (flag)
+                {
+                    for(int x = 0; x < 5; x++)
+                    {
+                        flag2 = false;
+                        for(int y = 0; y < 5; y++)
+                        {
+                            if (active_tetrimino.block_matrix_cpy[x][y])
+                            {
+                                flag2 = true;
+                                break;
+                            }
+                        }
+                        if(flag2)
+                            break;
+                        else
+                            active_tetrimino.moveLeft();
+                    }
+                }
+
+
                 break;
             case KeyEvent.VK_DOWN:
                 moveDown();
@@ -148,11 +270,16 @@ public class GameLoop
         if(check)
         {
             this.is_active = false;
+            Tetrimino temp = this.active_tetrimino;
+            this.tetriminos.add(temp);
         }
         else
         {
-            this.active_tetrimino.moveDown();
-            this.last_move = new Date().getTime();
+            if(this.is_active)
+            {
+                this.active_tetrimino.moveDown();
+                this.last_move = new Date().getTime();
+            }
         }
     }
 
@@ -195,5 +322,10 @@ public class GameLoop
     public boolean getActive()
     {
         return this.is_active;
+    }
+
+    public ArrayList<Tetrimino> getTetriminos()
+    {
+        return this.tetriminos;
     }
 }

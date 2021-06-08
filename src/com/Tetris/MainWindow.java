@@ -2,6 +2,7 @@ package com.Tetris;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class MainWindow extends JPanel
     implements Runnable
@@ -65,22 +66,52 @@ public class MainWindow extends JPanel
         int block_pos_x = (center_x - matrix_width / 2) + matrix_block_size;
         int block_pos_y = (center_y - matrix_height / 2) + matrix_block_size;
 
-        if(game.getActive())
+        if (game.getActive())
         {
             Tetrimino active = game.getActive_tetrimino();
             block_pos_x += active.getX() * matrix_block_size;
             block_pos_y += active.getY() * matrix_block_size;
             float color = active.getColor();
 
-            for(int y = 0; y < 5; y++)
+            for (int y = 0; y < 5; y++)
             {
                 for (int x = 0; x < 5; x++)
                 {
-                    if(active.block_matrix_cpy[x][y])
+                    if (active.block_matrix_cpy[x][y])
                     {
                         g2d.setColor(Color.getHSBColor(color, 1, 1));
                         g2d.fillRoundRect(block_pos_x, block_pos_y, matrix_block_size, matrix_block_size, arcs, arcs);
-                        g2d.setColor(Color.getHSBColor(color, (float)0.6, (float)0.4));
+                        g2d.setColor(Color.getHSBColor(color, (float) 0.6, (float) 0.4));
+                        g2d.drawRoundRect(block_pos_x, block_pos_y, matrix_block_size, matrix_block_size, arcs, arcs);
+                    }
+                    block_pos_x += matrix_block_size;
+                }
+                block_pos_x -= matrix_block_size * 5;
+                block_pos_y += matrix_block_size;
+            }
+        }
+
+        ArrayList<Tetrimino> tetriminos = game.getTetriminos();
+
+        for (int i = 0; i < tetriminos.size(); i++)
+        {
+            block_pos_x = (center_x - matrix_width / 2) + matrix_block_size;
+            block_pos_y = (center_y - matrix_height / 2) + matrix_block_size;
+
+            Tetrimino temp = tetriminos.get(i);
+            block_pos_x += temp.getX() * matrix_block_size;
+            block_pos_y += temp.getY() * matrix_block_size;
+            float color = temp.getColor();
+
+            for (int y = 0; y < 5; y++)
+            {
+                for (int x = 0; x < 5; x++)
+                {
+                    if (temp.block_matrix_cpy[x][y])
+                    {
+                        g2d.setColor(Color.getHSBColor(color, 1, 1));
+                        g2d.fillRoundRect(block_pos_x, block_pos_y, matrix_block_size, matrix_block_size, arcs, arcs);
+                        g2d.setColor(Color.getHSBColor(color, (float) 0.6, (float) 0.4));
                         g2d.drawRoundRect(block_pos_x, block_pos_y, matrix_block_size, matrix_block_size, arcs, arcs);
                     }
                     block_pos_x += matrix_block_size;
