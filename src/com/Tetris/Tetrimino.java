@@ -165,6 +165,46 @@ public class Tetrimino
         }
     }
 
+    public void rotateRight()
+    {
+        boolean[][] temp = new boolean[5][5];
+
+        if(center_y != -1 && center_x != -1)
+        {
+            for(int y = 0; y < 5; y++)
+            {
+                for(int x = 0; x < 5; x++)
+                {
+                    if(block_matrix[x][y])
+                    {
+                        if(x == center_x && y == center_y)
+                            temp[x][y] = true;
+
+                        if(x == center_x && y < center_y)
+                            temp[center_x + abs((center_y - y))][center_y] = true;
+                        if(x < center_x && y == center_y)
+                            temp[center_x][center_y - abs(center_x - x)] = true;
+                        if(x == center_x && y > center_y)
+                            temp[center_x - abs(center_y - y)][center_y] = true;
+                        if(x > center_x && y == center_y)
+                            temp[center_x][x] = true;
+
+                        if(x > center_x && y < center_y)
+                            temp[x][center_y + abs(center_y - y)] = true;
+                        if(x < center_x && y < center_y)
+                            temp[center_x + abs(center_x - x)][y] = true;
+                        if(x < center_x && y > center_y)
+                            temp[x][center_y - abs(center_y - y)] = true;
+                        if(x > center_x && y > center_y)
+                            temp[center_x - abs(center_x - x)][y] = true;
+                    }
+                }
+            }
+            block_matrix = temp;
+            block_matrix_cpy = block_matrix;
+        }
+    }
+
     public int getX()
     {
         return x;

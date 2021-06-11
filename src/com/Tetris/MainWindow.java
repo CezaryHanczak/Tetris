@@ -9,7 +9,7 @@ public class MainWindow extends JPanel
 {
     private Thread animator;
     private Thread gameThread;
-    private final GameLoop game;
+    private GameLoop game;
 
     private final int size_x;
     private final int size_y;
@@ -21,13 +21,23 @@ public class MainWindow extends JPanel
     private int matrix_height;
     private int matrix_width;
 
+    private enum GameStatus
+    {
+        MENU,
+        NEW_GAME,
+        GAME,
+        GAME_OVER,
+        HIGHSCORES
+    }
+
+    private GameStatus game_status;
+
     public MainWindow(GameLoop game, int size_x, int size_y)
     {
         this.size_x = size_x;
         this.size_y = size_y;
+        this.game_status = GameStatus.NEW_GAME;
         this.game = game;
-        this.gameThread = new Thread(this.game);
-        this.gameThread.start();
     }
 
     @Override
@@ -45,9 +55,31 @@ public class MainWindow extends JPanel
 
         matrix_block_size = matrix_width / size_x;
 
-        drawLayout(g);
-        drawBlocks(g);
-        Toolkit.getDefaultToolkit().sync();
+        if(this.game_status == GameStatus.MENU)
+        {
+
+        }
+        else if (this.game_status == GameStatus.NEW_GAME)
+        {
+            this.gameThread = new Thread(game);
+            this.gameThread.start();
+            this.game_status = GameStatus.GAME;
+        }
+        else if (this.game_status == GameStatus.GAME)
+        {
+            drawLayout(g);
+            drawBlocks(g);
+            Toolkit.getDefaultToolkit().sync();
+
+            if(!this.game.getActive())
+            {
+                this.game_status = GameStatus.GAME_OVER;
+            }
+        }
+        else if (this.game_status == GameStatus.GAME_OVER)
+        {
+
+        }
     }
 
     private void drawBlocks(Graphics g)

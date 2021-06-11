@@ -28,7 +28,7 @@ public class MainGame extends JFrame
 
         try
         {
-            ImageIcon img = new ImageIcon(getClass().getResource("img/icon40.png")); //IF pack in JAR
+            ImageIcon img = new ImageIcon(getClass().getResource("/img/icon40.png")); //IF pack in JAR
             setIconImage(img.getImage());
         }
         catch (Exception e){}

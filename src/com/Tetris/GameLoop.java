@@ -4,8 +4,6 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static java.lang.Math.abs;
-
 public class GameLoop
     implements Runnable
 {
@@ -48,6 +46,11 @@ public class GameLoop
                 this.active_tetrimino = this.next_tetrimino;
                 this.next_tetrimino = new Tetrimino();
                 this.is_active = true;
+                if(checkCollision())
+                {
+                    this.is_active = false;
+                    return;
+                }
             }
 
             try
@@ -173,101 +176,306 @@ public class GameLoop
         return false;
     }
 
+    private boolean checkCollisionRotate()
+    {
+        for (int y = 0; y < 5; y++)
+        {
+            for (int x = 0; x < 5; x++)
+            {
+                if (active_tetrimino.block_matrix_cpy[x][y])
+                {
+                    if (active_tetrimino.getX() + x >= size_x - 2)
+                    {
+                        active_tetrimino.moveLeft();
+                    }
+
+                }
+            }
+        }
+
+        boolean flag = false;
+        for (int y = 0; y < 5; y++)
+        {
+            for (int x = 4; x > 0; x--)
+            {
+                if (active_tetrimino.block_matrix_cpy[x][y])
+                {
+                    if (active_tetrimino.getX() + x <= 0)
+                    {
+                        active_tetrimino.moveRight();
+                        flag = true;
+                    }
+                }
+            }
+        }
+
+        //Sprawdzenie czy jest wolny blok po obróceniu (dla Tetrimino I)
+        boolean flag2;
+        if (flag)
+        {
+            for(int x = 0; x < 5; x++)
+            {
+                flag2 = false;
+                for(int y = 0; y < 5; y++)
+                {
+                    if (active_tetrimino.block_matrix_cpy[x][y])
+                    {
+                        flag2 = true;
+                        break;
+                    }
+                }
+                if(flag2)
+                    break;
+                else
+                    active_tetrimino.moveLeft();
+            }
+        }
+
+
+        for(Tetrimino tetrimino:tetriminos)
+        {
+            for (int y = 0; y < 5; y++)
+            {
+                for (int x = 0; x < 5; x++)
+                {
+                    for (int yy = 0; yy < 5; yy++)
+                    {
+                        for (int xx = 0; xx < 5; xx++)
+                        {
+                            if (active_tetrimino.block_matrix_cpy[x][y] && tetrimino.block_matrix_cpy[xx][yy])
+                            {
+                                if (active_tetrimino.getX() + x == tetrimino.getX() + xx && active_tetrimino.getY() + y == tetrimino.getY() + yy)
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public void keyPressed(int keyCode)
     {
         switch (keyCode) {
             case KeyEvent.VK_RIGHT:
-                for (int y = 0; y < 5; y++)
-                {
-                    for (int x = 0; x < 5; x++)
-                    {
-                        if (active_tetrimino.block_matrix_cpy[x][y])
-                        {
-                            if (active_tetrimino.getX() + x >= size_x - 3 || checkCollisionRight())
-                                return;
-                        }
-                    }
-                }
-                active_tetrimino.moveRight();
+            case KeyEvent.VK_D:
+                moveRight();
                 break;
             case KeyEvent.VK_LEFT:
-                for (int y = 0; y < 5; y++)
-                {
-                    for (int x = 0; x < 5; x++)
-                    {
-                        if (active_tetrimino.block_matrix_cpy[x][y])
-                        {
-                            if (active_tetrimino.getX() + x <= 0 || checkCollisionLeft())
-                                return;
-                        }
-                    }
-                }
-                active_tetrimino.moveLeft();
+            case KeyEvent.VK_A:
+                moveLeft();
                 break;
             case KeyEvent.VK_UP:
+            case KeyEvent.VK_Q:
                 active_tetrimino.rotateLeft();
-                for (int y = 0; y < 5; y++)
+                int left = 0;
+                int right = 0;
+                if(checkCollisionRotate())
                 {
-                    for (int x = 0; x < 5; x++)
+                    active_tetrimino.rotateRight();
+                    if(!checkCollisionLeft())
                     {
-                        if (active_tetrimino.block_matrix_cpy[x][y])
-                        {
-                            if (active_tetrimino.getX() + x >= size_x - 2)
-                                active_tetrimino.moveLeft();
-                        }
+                        moveLeft();
+                        left++;
                     }
-                }
-                boolean flag = false;
-                for (int y = 0; y < 5; y++)
-                {
-                    for (int x = 4; x > 0; x--)
+                    active_tetrimino.rotateLeft();
+                    if(checkCollisionRotate())
                     {
-                        if (active_tetrimino.block_matrix_cpy[x][y])
+                        active_tetrimino.rotateRight();
+                        if(!checkCollisionLeft())
                         {
-                            if (active_tetrimino.getX() + x <= 0)
+                            moveLeft();
+                            left++;
+                        }
+                        active_tetrimino.rotateLeft();
+                        if(checkCollisionRotate())
+                        {
+                            active_tetrimino.rotateRight();
+                            if(!checkCollisionLeft())
                             {
+                                moveLeft();
+                                left++;
+                            }
+                            active_tetrimino.rotateLeft();
+                            if(checkCollisionRotate())
+                            {
+                                active_tetrimino.rotateRight();
+                                while(left > 0)
+                                {
+                                    moveRight();
+                                    left--;
+                                }
 
-                                active_tetrimino.moveRight();
-                                flag = true;
+                                if(!checkCollisionRight())
+                                {
+                                    moveRight();
+                                    right++;
+                                }
+                                active_tetrimino.rotateLeft();
+                                if(checkCollisionRotate())
+                                {
+                                    active_tetrimino.rotateRight();
+                                    if(!checkCollisionRight())
+                                    {
+                                        moveRight();
+                                        right++;
+                                    }
+                                    active_tetrimino.rotateLeft();
+                                    if(checkCollisionRotate())
+                                    {
+                                        active_tetrimino.rotateRight();
+                                        if(!checkCollisionRight())
+                                        {
+                                            moveRight();
+                                            right++;
+                                        }
+                                        active_tetrimino.rotateLeft();
+                                        if(checkCollisionRotate())
+                                        {
+                                            active_tetrimino.rotateRight();
+
+                                            while(right > 0)
+                                            {
+                                                moveLeft();
+                                                right--;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
-
-                boolean flag2;
-                if (flag)
+                break;
+            case KeyEvent.VK_E:
+                active_tetrimino.rotateRight();
+                int right1 = 0;
+                int left1 = 0;
+                if(checkCollisionRotate())
                 {
-                    for(int x = 0; x < 5; x++)
+                    active_tetrimino.rotateLeft();
+                    if(!checkCollisionLeft())
                     {
-                        flag2 = false;
-                        for(int y = 0; y < 5; y++)
+                        moveLeft();
+                        left1++;
+                    }
+                    active_tetrimino.rotateRight();
+                    if(checkCollisionRotate())
+                    {
+                        active_tetrimino.rotateLeft();
+                        if(!checkCollisionLeft())
                         {
-                            if (active_tetrimino.block_matrix_cpy[x][y])
+                            moveLeft();
+                            left1++;
+                        }
+                        active_tetrimino.rotateRight();
+                        if(checkCollisionRotate())
+                        {
+                            active_tetrimino.rotateLeft();
+                            if(!checkCollisionLeft())
                             {
-                                flag2 = true;
-                                break;
+                                moveLeft();
+                                left1++;
+                            }
+                            active_tetrimino.rotateRight();
+                            if(checkCollisionRotate())
+                            {
+                                active_tetrimino.rotateLeft();
+                                while(left1 > 0)
+                                {
+                                    moveRight();
+                                    left1--;
+                                }
+
+                                if(!checkCollisionRight())
+                                {
+                                    moveRight();
+                                    right1++;
+                                }
+                                active_tetrimino.rotateRight();
+                                if(checkCollisionRotate())
+                                {
+                                    active_tetrimino.rotateLeft();
+                                    if(!checkCollisionRight())
+                                    {
+                                        moveRight();
+                                        right1++;
+                                    }
+                                    active_tetrimino.rotateRight();
+                                    if(checkCollisionRotate())
+                                    {
+                                        active_tetrimino.rotateLeft();
+                                        if(!checkCollisionRight())
+                                        {
+                                            moveRight();
+                                            right1++;
+                                        }
+                                        active_tetrimino.rotateRight();
+                                        if(checkCollisionRotate())
+                                        {
+                                            active_tetrimino.rotateLeft();
+                                            while(right1 > 0)
+                                            {
+                                                moveLeft();
+                                                right1--;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
-                        if(flag2)
-                            break;
-                        else
-                            active_tetrimino.moveLeft();
                     }
                 }
-
-
+                break;
+            case KeyEvent.VK_SPACE:
+                moveDownAtOnce();
                 break;
             case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_S:
                 moveDown();
                 this.score += 2;
                 break;
         }
     }
 
+    private void moveLeft()
+    {
+        for (int y = 0; y < 5; y++)
+        {
+            for (int x = 0; x < 5; x++)
+            {
+                if (active_tetrimino.block_matrix_cpy[x][y])
+                {
+                    if (active_tetrimino.getX() + x <= 0 || checkCollisionLeft())
+                        return;
+                }
+            }
+        }
+        active_tetrimino.moveLeft();
+    }
+
+    private void moveRight()
+    {
+        for (int y = 0; y < 5; y++)
+        {
+            for (int x = 0; x < 5; x++)
+            {
+                if (active_tetrimino.block_matrix_cpy[x][y])
+                {
+                    if (active_tetrimino.getX() + x >= size_x - 3 || checkCollisionRight())
+                        return;
+                }
+            }
+        }
+        active_tetrimino.moveRight();
+    }
+
     private void moveDown()
     {
-        boolean check = checkCollision();
-        if(check)
+        if(checkCollision())
         {
             this.is_active = false;
             Tetrimino temp = this.active_tetrimino;
@@ -282,6 +490,15 @@ public class GameLoop
             }
         }
     }
+
+    private void moveDownAtOnce()
+    {
+        while(!checkCollision())
+            moveDown();
+        this.last_move = 0;
+        this.score += 100;
+    }
+
 
     private void newLevel()
     {
