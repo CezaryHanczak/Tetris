@@ -2,6 +2,7 @@ package com.Tetris;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 public class MainWindow extends JPanel
@@ -10,6 +11,7 @@ public class MainWindow extends JPanel
     private Thread animator;
     private Thread gameThread;
     private GameLoop game;
+    private SoundEffects sounds;
 
     private final int size_x;
     private final int size_y;
@@ -32,12 +34,12 @@ public class MainWindow extends JPanel
 
     private GameStatus game_status;
 
-    public MainWindow(GameLoop game, int size_x, int size_y)
+    public MainWindow(int size_x, int size_y, SoundEffects sounds)
     {
         this.size_x = size_x;
         this.size_y = size_y;
         this.game_status = GameStatus.NEW_GAME;
-        this.game = game;
+        this.sounds = sounds;
     }
 
     @Override
@@ -61,6 +63,7 @@ public class MainWindow extends JPanel
         }
         else if (this.game_status == GameStatus.NEW_GAME)
         {
+            this.game = new GameLoop(size_x, size_y, this.sounds);
             this.gameThread = new Thread(game);
             this.gameThread.start();
             this.game_status = GameStatus.GAME;
@@ -71,7 +74,7 @@ public class MainWindow extends JPanel
             drawBlocks(g);
             Toolkit.getDefaultToolkit().sync();
 
-            if(!this.game.getActive())
+            if(this.game.getGameOver())
             {
                 this.game_status = GameStatus.GAME_OVER;
             }
@@ -195,7 +198,7 @@ public class MainWindow extends JPanel
 
         //Fonts
         g2d.setColor(Color.GRAY);
-        Font font = new Font("Bauhaus 93", 0, (int)(width * 0.022));
+        Font font = new Font("Bauhaus 93", Font.PLAIN, (int)(width * 0.022));
         g2d.setFont(font);
 
         //Score box text generate
@@ -212,11 +215,11 @@ public class MainWindow extends JPanel
 
         //Next figure box
         g2d.drawRoundRect(block_pos_x + (12 * matrix_block_size) + (int)(width * 0.05), block_pos_y, (int)(width * 0.2), (int)(width * 0.2), arcs, arcs);
-        font = new Font("Bauhaus 93", 0, (int)(width * 0.06));
+        font = new Font("Bauhaus 93", Font.PLAIN, (int)(width * 0.06));
         g2d.setFont(font);
         g2d.drawString("T e t r i s", center_x - (int)(width * 0.11), block_pos_y + (int)(width * 0.012));
 //
-        font = new Font("Bauhaus 93", 0, (int)(width * 0.022));
+        font = new Font("Bauhaus 93", Font.PLAIN, (int)(width * 0.022));
         g2d.setFont(font);
         g2d.setColor(Color.BLACK);
         g2d.fillRect(block_pos_x + (12 * matrix_block_size) + (int)(width * 0.074), block_pos_y - (int)(width * 0.01), (int)(width * 0.156), (int)(width * 0.03));
@@ -284,5 +287,13 @@ public class MainWindow extends JPanel
                 System.out.println("Animation Thread Error");
             }
         }
+    }
+
+    public void keyPressed(KeyEvent e)
+    {
+        if(this.game_status == GameStatus.GAME)
+            this.game.keyPressed(e.getKeyCode());
+        else
+            game_status = GameStatus.NEW_GAME;
     }
 }

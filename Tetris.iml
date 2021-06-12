@@ -4,17 +4,22 @@
     <facet type="IntelliGuard" name="Obfuscation">
       <configuration>
         <option name="yGuardJar" value="C:\Users\Czarek\Desktop\Sztudia\Sem4\PO2\yguard-bundle-3.0.0\lib\yguard-3.0.0.jar" />
-        <option name="inFile" value="C:\Users\Czarek\Desktop\Sztudia\Sem4\PO2\Tetris\New Folder (2)\tetris.jar" />
-        <option name="outFile" value="C:\Users\Czarek\Desktop\Sztudia\Sem4\PO2\Tetris\New Folder\ob.jar" />
+        <option name="inFile" value="C:\Users\Czarek\Desktop\Sztudia\Sem4\PO2\Tetris\out\artifacts\Tetris_jar\Tetris.jar" />
+        <option name="outFile" value="C:\Users\Czarek\Desktop\Sztudia\Sem4\PO2\Tetris\out\artifacts\Tetris_jar\TetrisOB.jar" />
         <option name="mainclass" value="com.Tetris.Main" />
-        <option name="conservemanifest" value="true" />
-        <option name="errorChecking" value="false" />
-        <option name="namingScheme" value="mix" />
+        <option name="namingScheme" value="best" />
+        <option name="namingSafety" value="illegal" />
+        <option name="runtimevisibleannotations" value="false" />
+        <option name="runtimevisibleparameterannotations" value="false" />
+        <option name="runtimeinvisibleannotations" value="false" />
+        <option name="runtimeinvisibleparameterannotations" value="false" />
         <option name="jarConfig">
           <JarConfig>
             <option name="jarEntries">
               <list>
                 <option value="C:\Users\Czarek\Desktop\Sztudia\Sem4\PO2\Tetris\out\production\Tetris" />
+                <option value="C:\Users\Czarek\Desktop\Sztudia\Sem4\PO2\Tetris\sounds" />
+                <option value="C:\Users\Czarek\Desktop\Sztudia\Sem4\PO2\Tetris\img" />
               </list>
             </option>
           </JarConfig>
@@ -27,7 +32,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="corretto-1.8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

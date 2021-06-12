@@ -3,12 +3,15 @@ package com.Tetris;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+/**
+ * Klasa obsługująca zdarzenia klawiatury i przekazująca zdarzenie do obiektu {@link MainWindow}
+ */
 public class KeysEvents implements KeyListener
 {
-    private final GameLoop game;
-    public KeysEvents(GameLoop game)
+    private final MainWindow main_window;
+    public KeysEvents(MainWindow main_window)
     {
-        this.game = game;
+        this.main_window = main_window;
     }
 
     @Override
@@ -20,7 +23,7 @@ public class KeysEvents implements KeyListener
     @Override
     public void keyPressed(KeyEvent e)
     {
-        game.keyPressed(e.getKeyCode());
+        main_window.keyPressed(e);
     }
 
     @Override

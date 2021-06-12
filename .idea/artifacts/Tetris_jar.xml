@@ -2,10 +2,16 @@
   <artifact type="jar" name="Tetris:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/Tetris_jar</output-path>
     <root id="archive" name="Tetris.jar">
-      <element id="module-output" name="Tetris" />
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
       <element id="directory" name="img">
         <element id="dir-copy" path="$PROJECT_DIR$/img" />
       </element>
+      <element id="directory" name="sounds">
+        <element id="dir-copy" path="$PROJECT_DIR$/sounds" />
+      </element>
+      <element id="module-output" name="Tetris" />
     </root>
   </artifact>
 </component>
