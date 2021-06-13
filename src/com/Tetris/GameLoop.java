@@ -20,7 +20,7 @@ public class GameLoop
 
     private Tetrimino active_tetrimino;
     private Tetrimino next_tetrimino;
-    private SoundEffects sounds;
+    private final SoundEffects sounds;
 
     private ArrayList<Tetrimino> tetriminos;
 
@@ -36,6 +36,7 @@ public class GameLoop
         this.is_active = false;
         this.gameOver = false;
         this.next_tetrimino = new Tetrimino();
+        this.next_tetrimino.tetriminoGenerate();
         this.tetriminos = new ArrayList<>();    //lista bloków na planszy
         this.sounds = sounds;
 
@@ -46,17 +47,19 @@ public class GameLoop
      * Wątek główny gry, sprawdza odpowiednie zależności, generuje nowe Tetrimino oraz wykonuje samoczynne ruchy Tetrimino
      * Po przegraniu kończy pętlę i grę oraz ustawia flagę <bold>gameOver</bold> na wartość <bold>true</bold>
      */
+    @Override
     public void run()
     {
         while(true)
         {
-            newLevel(); //sprawdzenie czy można zwiększyć poziom
+            this.newLevel(); //sprawdzenie czy można zwiększyć poziom
             if(!this.is_active) //jeśli poprzedni blok został ustawiony zmiana na nowy
             {
                 this.active_tetrimino = this.next_tetrimino;
                 this.next_tetrimino = new Tetrimino();
+                this.next_tetrimino.tetriminoGenerate();
                 this.is_active = true;
-                if(checkCollision())  //sprawdzenie końca gry
+                if(this.checkCollision())  //sprawdzenie końca gry
                 {
                     this.is_active = false;
                     this.gameOver = true;
@@ -78,18 +81,13 @@ public class GameLoop
             Date date = new Date();
             if(date.getTime() - this.last_move >= this.round_time)  //przesuwanie Tetrimino w dół co określony czas rundy
             {
-                moveDown();
+                this.moveDown();
                 this.last_move = date.getTime();
+                CheckLines checkLines = new CheckLines(this.tetriminos, this.size_x, this.size_y, this, this.sounds);
+                Thread checkLinesThread = new Thread(checkLines);
+                checkLinesThread.start();
             }
         }
-    }
-
-    private void checkLines()
-    {
-        int x = this.size_x - 1; //sprawdzanie od dołu
-
-
-
     }
 
     /**
@@ -133,6 +131,48 @@ public class GameLoop
     }
 
     /**
+     * Funkcja sprawdza czy pod jakimkolwiek elemencie z <bold>podanego w argumencie</bold>> jest spód planszy lub część innego Tetrimino.
+     * Zwraca <code>true</code> jeśli tak, <code>false</code> w przeciwnym wypadku
+     */
+    private boolean checkCollision(Tetrimino tetrimino)
+    {
+
+        for(int y = 0; y < 5; y++)
+        {
+            for (int x = 0; x < 5; x++)
+            {
+                if(tetrimino.block_matrix_cpy[x][y])
+                {
+                    if(tetrimino.getY() + y >= this.size_y - 2)
+                        return true;
+
+                    for(int i = 0; i < this.tetriminos.size(); i++)
+                    {
+                        Tetrimino temp = this.tetriminos.get(i);
+                        if(temp.getY() == tetrimino.getY() && temp.getX() == tetrimino.getX() && temp.getColor() == tetrimino.getColor())
+                            break;
+
+                        for(int y_ = 0; y_ < 5; y_++)
+                        {
+                            for(int x_ = 0; x_ < 5; x_++)
+                            {
+                                if(temp.block_matrix_cpy[x_][y_])
+                                {
+                                    if(x + tetrimino.getX() == x_ + temp.getX() && y + tetrimino.getY() == y_ + temp.getY()  - 1)
+                                    {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      Funkcja sprawdza czy po <bold>prawej</bold> stronie jakiegokolwiek elementu z obecnego Tetrimino jest prawa koniec planszy lub część innego Tetrimino.
      Zwraca <code>true</code> jeśli tak, <code>false</code> w przeciwnym wypadku
      */
@@ -144,7 +184,7 @@ public class GameLoop
             {
                 if(this.active_tetrimino.block_matrix_cpy[x][y])
                 {
-                    if(this.active_tetrimino.getY() + y >= this.size_y - 2)
+                    if(this.active_tetrimino.getY() + y > this.size_y - 2)
                         return true;
 
                     for(int i = 0; i < this.tetriminos.size(); i++)
@@ -183,7 +223,7 @@ public class GameLoop
             {
                 if(this.active_tetrimino.block_matrix_cpy[x][y])
                 {
-                    if(this.active_tetrimino.getY() + y >= this.size_y - 2)
+                    if(this.active_tetrimino.getY() + y > this.size_y - 2)
                         return true;
 
                     for(int i = 0; i < this.tetriminos.size(); i++)
@@ -319,8 +359,6 @@ public class GameLoop
             case KeyEvent.VK_UP:
             case KeyEvent.VK_Q:
                 active_tetrimino.rotateLeft();
-                int left = 0;
-                int right = 0;
                 int x = active_tetrimino.getX();
                 if(checkCollisionRotate() && !checkCollision())
                 {
@@ -386,8 +424,6 @@ public class GameLoop
                 break;
             case KeyEvent.VK_E:
                 active_tetrimino.rotateRight();
-                int right1 = 0;
-                int left1 = 0;
                 int x2 = active_tetrimino.getX();
                 //Sprawdzanie czy można zmiecić Tetrimino po obrocie i przesunięcie w lewo lub prawo bez innych kolizji
                 if(checkCollisionRotate())
@@ -458,13 +494,15 @@ public class GameLoop
             case KeyEvent.VK_DOWN:
             case KeyEvent.VK_S:
                 moveDown();
-                this.score += 2;
+                this.addScore(2);
                 break;
         }
     }
 
     private void moveLeft()
     {
+        if(!this.is_active)
+            return;
         for (int y = 0; y < 5; y++)
         {
             for (int x = 0; x < 5; x++)
@@ -481,6 +519,8 @@ public class GameLoop
 
     private void moveRight()
     {
+        if(!this.is_active)
+            return;
         for (int y = 0; y < 5; y++)
         {
             for (int x = 0; x < 5; x++)
@@ -497,7 +537,7 @@ public class GameLoop
 
     private void moveDown()
     {
-        if(checkCollision())
+        if(this.checkCollision())
         {
             this.is_active = false;
             Tetrimino temp = this.active_tetrimino;
@@ -513,13 +553,23 @@ public class GameLoop
         }
     }
 
+    boolean moveDown(Tetrimino tetrimino)
+    {
+        if(!this.checkCollision(tetrimino))
+        {
+            tetrimino.moveDown();
+            return true;
+        }
+        return false;
+    }
+
     private void moveDownAtOnce()
     {
         while(!checkCollision())
             moveDown();
         this.sounds.moveDown();
         this.last_move = 0;
-        this.score += 100;
+        this.addScore(100);
     }
 
     private void newLevel()
@@ -564,13 +614,28 @@ public class GameLoop
         return this.is_active;
     }
 
+    public int getRoundTime()
+    {
+        return this.round_time;
+    }
+
     public boolean getGameOver()
     {
         return this.gameOver;
     }
 
-    public ArrayList<Tetrimino> getTetriminos()
+    ArrayList<Tetrimino> getTetriminos()
     {
         return this.tetriminos;
+    }
+
+    synchronized void addScore(int score)
+    {
+        this.score += score;
+    }
+
+    synchronized void addLines(int lines)
+    {
+        this.lines += lines;
     }
 }

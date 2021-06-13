@@ -20,10 +20,28 @@ public class Tetrimino
     {
         block_matrix = new boolean[5][5];
         block_matrix_cpy = new boolean[5][5];
-        x = 4;
+        x = 0;
         y = 0;
         clear();
-        generateBlock();
+    }
+
+    public Tetrimino(float color)
+    {
+        block_matrix = new boolean[5][5];
+        block_matrix_cpy = new boolean[5][5];
+        x = 0;
+        y = 0;
+        this.color = color;
+        clear();
+    }
+
+    public void tetriminoGenerate()
+    {
+        if(x == 0 && y == 0)
+        {
+            x = 4;
+            generateBlock();
+        }
     }
 
     private void clear()

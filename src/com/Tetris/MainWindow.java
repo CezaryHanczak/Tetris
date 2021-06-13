@@ -11,7 +11,7 @@ public class MainWindow extends JPanel
     private Thread animator;
     private Thread gameThread;
     private GameLoop game;
-    private SoundEffects sounds;
+    private final SoundEffects sounds;
 
     private final int size_x;
     private final int size_y;
@@ -59,7 +59,7 @@ public class MainWindow extends JPanel
 
         if(this.game_status == GameStatus.MENU)
         {
-
+            drawLayout(g);
         }
         else if (this.game_status == GameStatus.NEW_GAME)
         {
@@ -80,6 +80,10 @@ public class MainWindow extends JPanel
             }
         }
         else if (this.game_status == GameStatus.GAME_OVER)
+        {
+
+        }
+        else if (this.game_status == GameStatus.HIGHSCORES)
         {
 
         }
