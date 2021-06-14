@@ -2,13 +2,14 @@ package com.Tetris;
 
 import javax.swing.*;
 import java.util.Objects;
+import java.util.concurrent.Semaphore;
 
 /**
  * Główne okno aplikacji
  */
 public class MainGame extends JFrame
 {
-
+    private final Semaphore semaphore1 = new Semaphore(1);
     public MainGame()
     {
         initUI();
@@ -21,7 +22,7 @@ public class MainGame extends JFrame
     private void initUI()
     {
         SoundEffects sounds = new SoundEffects();
-        MainWindow main_window = new MainWindow(12, 20, sounds);
+        MainWindow main_window = new MainWindow(12, 20, sounds, this.semaphore1);
         add(main_window);
         addKeyListener(new KeysEvents( main_window));
         setSize(800, 800);
@@ -29,6 +30,8 @@ public class MainGame extends JFrame
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        //setExtendedState(JFrame.MAXIMIZED_BOTH);
+        //setUndecorated(true);
 
         try
         {

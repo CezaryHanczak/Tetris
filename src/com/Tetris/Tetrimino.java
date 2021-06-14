@@ -16,7 +16,7 @@ public class Tetrimino
     private int center_x;
     private int center_y;
 
-    public Tetrimino()
+    Tetrimino()
     {
         block_matrix = new boolean[5][5];
         block_matrix_cpy = new boolean[5][5];
@@ -25,7 +25,7 @@ public class Tetrimino
         clear();
     }
 
-    public Tetrimino(float color)
+    Tetrimino(float color)
     {
         block_matrix = new boolean[5][5];
         block_matrix_cpy = new boolean[5][5];
@@ -35,7 +35,7 @@ public class Tetrimino
         clear();
     }
 
-    public void tetriminoGenerate()
+    void tetriminoGenerate()
     {
         if(x == 0 && y == 0)
         {
@@ -128,22 +128,22 @@ public class Tetrimino
         block_matrix_cpy = block_matrix;
     }
 
-    public void moveDown()
+    void moveDown()
     {
         this.y++;
     }
 
-    public void moveRight()
+    void moveRight()
     {
         this.x++;
     }
 
-    public void moveLeft()
+    void moveLeft()
     {
         this.x--;
     }
 
-    public void rotateLeft()
+    void rotateLeft()
     {
         boolean[][] temp = new boolean[5][5];
 

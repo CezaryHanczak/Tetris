@@ -3,6 +3,7 @@ package com.Tetris;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.Semaphore;
 
 public class GameLoop
     implements Runnable
@@ -21,10 +22,11 @@ public class GameLoop
     private Tetrimino active_tetrimino;
     private Tetrimino next_tetrimino;
     private final SoundEffects sounds;
+    private final Semaphore semaphore1;
 
     private ArrayList<Tetrimino> tetriminos;
 
-    public GameLoop(int size_x, int size_y, SoundEffects sounds)
+    public GameLoop(int size_x, int size_y, SoundEffects sounds, Semaphore semaphore)
     {
         this.size_x = size_x;
         this.size_y = size_y;
@@ -39,6 +41,11 @@ public class GameLoop
         this.next_tetrimino.tetriminoGenerate();
         this.tetriminos = new ArrayList<>();    //lista bloków na planszy
         this.sounds = sounds;
+        this.semaphore1 = semaphore;
+
+        CheckLines checkLines = new CheckLines(this.size_x, this.size_y, this, this.sounds, this.semaphore1);
+        Thread checkLinesThread = new Thread(checkLines);
+        checkLinesThread.start();
 
         sounds.playBackgroundMusic();
     }
@@ -83,11 +90,43 @@ public class GameLoop
             {
                 this.moveDown();
                 this.last_move = date.getTime();
-                CheckLines checkLines = new CheckLines(this.tetriminos, this.size_x, this.size_y, this, this.sounds);
-                Thread checkLinesThread = new Thread(checkLines);
-                checkLinesThread.start();
+                this.clearTetriminos();
+            }
+
+            if(this.gameOver)
+            {
+                this.is_active = false;
+                this.sounds.stopBackgroundMusic();
+                break;
             }
         }
+    }
+
+    private void clearTetriminos()
+    {
+        try
+        {
+            this.semaphore1.acquire();
+        }
+        catch (Exception e)
+        {
+            return;
+        }
+        for(int i = 0; i < tetriminos.size(); i++)
+        {
+            boolean is_clear = true;
+            for(int y = 0; y < 5; y++)
+            {
+                for(int x = 0; x < 5; x++)
+                {
+                    if(tetriminos.get(i).block_matrix_cpy[x][y])
+                        is_clear = false;
+                }
+            }
+            if(is_clear)
+                tetriminos.remove(i);
+        }
+        this.semaphore1.release();
     }
 
     /**
@@ -101,10 +140,22 @@ public class GameLoop
         {
             for (int x = 0; x < 5; x++)
             {
+                try
+                {
+                    this.semaphore1.acquire();
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+
                 if(this.active_tetrimino.block_matrix_cpy[x][y])
                 {
                     if(this.active_tetrimino.getY() + y >= this.size_y - 2)
+                    {
+                        this.semaphore1.release();
                         return true;
+                    }
 
                     for(int i = 0; i < this.tetriminos.size(); i++)
                     {
@@ -118,6 +169,7 @@ public class GameLoop
                                 {
                                     if(x + this.active_tetrimino.getX() == x_ + temp.getX() && y + this.active_tetrimino.getY() == y_ + temp.getY()  - 1)
                                     {
+                                        this.semaphore1.release();
                                         return true;
                                     }
                                 }
@@ -125,6 +177,7 @@ public class GameLoop
                         }
                     }
                 }
+                this.semaphore1.release();
             }
         }
         return false;
@@ -141,17 +194,28 @@ public class GameLoop
         {
             for (int x = 0; x < 5; x++)
             {
+                try
+                {
+                    this.semaphore1.acquire();
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+
                 if(tetrimino.block_matrix_cpy[x][y])
                 {
                     if(tetrimino.getY() + y >= this.size_y - 2)
+                    {
+                        this.semaphore1.release();
                         return true;
+                    }
 
                     for(int i = 0; i < this.tetriminos.size(); i++)
                     {
                         Tetrimino temp = this.tetriminos.get(i);
                         if(temp.getY() == tetrimino.getY() && temp.getX() == tetrimino.getX() && temp.getColor() == tetrimino.getColor())
                             break;
-
                         for(int y_ = 0; y_ < 5; y_++)
                         {
                             for(int x_ = 0; x_ < 5; x_++)
@@ -160,6 +224,7 @@ public class GameLoop
                                 {
                                     if(x + tetrimino.getX() == x_ + temp.getX() && y + tetrimino.getY() == y_ + temp.getY()  - 1)
                                     {
+                                        this.semaphore1.release();
                                         return true;
                                     }
                                 }
@@ -167,6 +232,7 @@ public class GameLoop
                         }
                     }
                 }
+                this.semaphore1.release();
             }
         }
         return false;
@@ -182,10 +248,23 @@ public class GameLoop
         {
             for (int x = 0; x < 5; x++)
             {
+                try
+                {
+                    this.semaphore1.acquire();
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+
                 if(this.active_tetrimino.block_matrix_cpy[x][y])
                 {
                     if(this.active_tetrimino.getY() + y > this.size_y - 2)
+                    {
+                        this.semaphore1.release();
                         return true;
+                    }
+
 
                     for(int i = 0; i < this.tetriminos.size(); i++)
                     {
@@ -199,6 +278,7 @@ public class GameLoop
                                 {
                                     if(x + this.active_tetrimino.getX() == x_ + temp.getX() - 1 && y + this.active_tetrimino.getY() == y_ + temp.getY())
                                     {
+                                        this.semaphore1.release();
                                         return true;
                                     }
                                 }
@@ -206,6 +286,7 @@ public class GameLoop
                         }
                     }
                 }
+                this.semaphore1.release();
             }
         }
         return false;
@@ -221,10 +302,24 @@ public class GameLoop
         {
             for (int x = 0; x < 5; x++)
             {
+                try
+                {
+                    this.semaphore1.acquire();
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+
                 if(this.active_tetrimino.block_matrix_cpy[x][y])
                 {
                     if(this.active_tetrimino.getY() + y > this.size_y - 2)
+                    {
+                        this.semaphore1.release();
                         return true;
+                    }
+
+
 
                     for(int i = 0; i < this.tetriminos.size(); i++)
                     {
@@ -238,6 +333,7 @@ public class GameLoop
                                 {
                                     if(x + this.active_tetrimino.getX() - 1 == x_ + temp.getX() && y + this.active_tetrimino.getY() == y_ + temp.getY())
                                     {
+                                        this.semaphore1.release();
                                         return true;
                                     }
                                 }
@@ -245,6 +341,7 @@ public class GameLoop
                         }
                     }
                 }
+                this.semaphore1.release();
             }
         }
         return false;
@@ -257,6 +354,14 @@ public class GameLoop
      */
     private boolean checkCollisionRotate()
     {
+        try
+        {
+            this.semaphore1.acquire();
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
         //sprawdzenie czy blok jest poza planszą z prawej strony i ewentualne przesunięcie
         for (int y = 0; y < 5; y++)
         {
@@ -328,6 +433,7 @@ public class GameLoop
                             {
                                 if (active_tetrimino.getX() + x == tetrimino.getX() + xx && active_tetrimino.getY() + y == tetrimino.getY() + yy)
                                 {
+                                    this.semaphore1.release();
                                     return true;
                                 }
                             }
@@ -336,6 +442,7 @@ public class GameLoop
                 }
             }
         }
+        semaphore1.release();
         return false;
     }
 
@@ -576,50 +683,55 @@ public class GameLoop
     {
         if(this.lines >= this.new_level)
         {
-            this.new_level *= 2;
-            this.round_time /= 2;
+            this.new_level *= 1.5;
+            this.round_time -= this.round_time * 1/(this.level + 2);
             this.score += 1000 * this.level;
             ++this.level;
             this.sounds.levelUp();
         }
     }
 
-    public int getScore()
+    void endGame()
+    {
+        this.gameOver = true;
+    }
+
+    int getScore()
     {
         return this.score;
     }
 
-    public int getLevel()
+    int getLevel()
     {
         return this.level;
     }
 
-    public int getLines()
+    int getLines()
     {
         return this.lines;
     }
 
-    public Tetrimino getActive_tetrimino()
+    Tetrimino getActive_tetrimino()
     {
         return this.active_tetrimino;
     }
 
-    public Tetrimino getNext_tetrimino()
+    Tetrimino getNext_tetrimino()
     {
         return this.next_tetrimino;
     }
 
-    public boolean getActive()
+    boolean getActive()
     {
         return this.is_active;
     }
 
-    public int getRoundTime()
+    int getRoundTime()
     {
         return this.round_time;
     }
 
-    public boolean getGameOver()
+    boolean getGameOver()
     {
         return this.gameOver;
     }
@@ -629,12 +741,12 @@ public class GameLoop
         return this.tetriminos;
     }
 
-    synchronized void addScore(int score)
+    void addScore(int score)
     {
         this.score += score;
     }
 
-    synchronized void addLines(int lines)
+    void addLines(int lines)
     {
         this.lines += lines;
     }
