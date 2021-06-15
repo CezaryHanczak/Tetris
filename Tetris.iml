@@ -8,11 +8,6 @@
         <option name="outFile" value="C:\Users\Czarek\Desktop\Sztudia\Sem4\PO2\Tetris\out\artifacts\Tetris_jar\TetrisOB.jar" />
         <option name="mainclass" value="com.Tetris.Main" />
         <option name="namingScheme" value="best" />
-        <option name="namingSafety" value="illegal" />
-        <option name="runtimevisibleannotations" value="false" />
-        <option name="runtimevisibleparameterannotations" value="false" />
-        <option name="runtimeinvisibleannotations" value="false" />
-        <option name="runtimeinvisibleparameterannotations" value="false" />
         <option name="jarConfig">
           <JarConfig>
             <option name="jarEntries">
@@ -34,7 +29,6 @@
     </content>
     <orderEntry type="jdk" jdkName="corretto-1.8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="mssql-jdbc-9.2.1.jre8" level="project" />
-    <orderEntry type="library" name="mysql-connector-java-8.0.25" level="project" />
+    <orderEntry type="library" exported="" name="mysql-connector-java-8.0.25" level="project" />
   </component>
 </module>

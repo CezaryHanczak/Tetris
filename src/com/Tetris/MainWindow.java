@@ -1,15 +1,10 @@
 package com.Tetris;
 
-import com.microsoft.sqlserver.jdbc.StringUtils;
-
 import javax.swing.*;
-import javax.xml.transform.Result;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 
@@ -328,13 +323,13 @@ public class MainWindow extends JPanel
 
         //Tytul gry
         g2d.setColor(Color.GRAY);
-        Font font = new Font("Bauhaus 93", Font.CENTER_BASELINE, (int)(width * 0.1));
+        Font font = new Font("Bauhaus 93", Font.PLAIN, (int)(width * 0.1));
         g2d.setFont(font);
         FontMetrics metrics = g2d.getFontMetrics(font);  //do środkowania tekstów
         g2d.drawString("Tetris", center_x - (metrics.stringWidth("Tetris") / 2), (int)(getHeight() * 0.2));
 
 
-        font = new Font("Bauhaus 93", Font.CENTER_BASELINE, (int)(width * 0.04));
+        font = new Font("Bauhaus 93", Font.PLAIN, (int)(width * 0.04));
         g2d.setFont(font);
         metrics = g2d.getFontMetrics(font);  //do środkowania tekstów
 
@@ -393,6 +388,19 @@ public class MainWindow extends JPanel
         g2d.setColor(Color.black);
         g2d.fillRect(0,0, width, getHeight());
 
+        //Nagłówek
+        g2d.setColor(Color.GRAY);
+        Font font = new Font("Bauhaus 93", Font.PLAIN, (int)(width * 0.1));
+        g2d.setFont(font);
+        FontMetrics metrics = g2d.getFontMetrics(font);  //do środkowania tekstów
+        g2d.drawString("Highscores", center_x - (metrics.stringWidth("Highscores") / 2), (int)(getHeight() * 0.2));
+
+
+
+        font = new Font("Bauhaus 93", Font.PLAIN, (int)(width * 0.025));
+        g2d.setFont(font);
+        metrics = g2d.getFontMetrics(font);  //do środkowania tekstów
+
         if (!this.have_result)
         {
             try
@@ -406,15 +414,58 @@ public class MainWindow extends JPanel
         }
         else
         {
+            g2d.drawString( "Postition", (int) (center_x - (metrics.stringWidth("Postition") / 2) - (width * 0.4)), (int)(getHeight() * (0.3)));
+            g2d.drawString("Nickname", (int) (center_x - (metrics.stringWidth("Nickname") / 2) - (width * 0.20)), (int)(getHeight() * (0.3)));
+            g2d.drawString("Score", (int) (center_x - (metrics.stringWidth("Score") / 2) + (width * 0.1)), (int)(getHeight() * (0.3)));
+            g2d.drawString("Level", (int) (center_x - (metrics.stringWidth("Level") / 2) + (width * 0.24)), (int)(getHeight() * (0.3)));
+            g2d.drawString("Lines", (int) (center_x - (metrics.stringWidth("Lines") / 2) + (width * 0.3)), (int)(getHeight() * (0.3)));
+            g2d.drawString("Date", (int) (center_x - (metrics.stringWidth("Date") / 2) + (width * 0.4)), (int)(getHeight() * (0.3)));
+
+            font = new Font("Bauhaus 93", Font.PLAIN, (int)(width * 0.015));
+            g2d.setFont(font);
+            metrics = g2d.getFontMetrics(font);  //do środkowania tekstów
             try
             {
                 this.semaphore1.acquire();
+                float i = (float)0.06;
+                int counter = 1;
+
                 for(HighscoreResults highscoreResults:this.highscores)
                 {
-                    System.out.println(highscoreResults.getPosition() + ". " + highscoreResults.getNickname());
+                    String position = highscoreResults.getPosition() + ".";
+                    g2d.drawString(position, (int) (center_x - (metrics.stringWidth(position) / 2) - (width * 0.4)), (int)(getHeight() * (0.3 + i)));
+
+                    g2d.drawString(highscoreResults.getNickname(), (int) (center_x - (metrics.stringWidth(highscoreResults.getNickname()) / 2) - (width * 0.20)), (int)(getHeight() * (0.3 + i)));
+                    g2d.drawString(highscoreResults.getScore(), (int) (center_x - (metrics.stringWidth(highscoreResults.getScore()) / 2) + (width * 0.1)), (int)(getHeight() * (0.3 + i)));
+                    g2d.drawString(highscoreResults.getLevel(), (int) (center_x - (metrics.stringWidth(highscoreResults.getLevel()) / 2) + (width * 0.24)), (int)(getHeight() * (0.3 + i)));
+                    g2d.drawString(highscoreResults.getLines(), (int) (center_x - (metrics.stringWidth(highscoreResults.getLines()) / 2) + (width * 0.3)), (int)(getHeight() * (0.3 + i)));
+                    g2d.drawString(highscoreResults.getDate(), (int) (center_x - (metrics.stringWidth(highscoreResults.getDate()) / 2) + (width * 0.4)), (int)(getHeight() * (0.3 + i)));
+
+                    i += 0.06;
+                    counter++;
+                }
+
+                while (counter <= 10)
+                {
+                    g2d.drawString(counter + ".", (int) (center_x - (metrics.stringWidth(counter + ".") / 2) - (width * 0.4)), (int)(getHeight() * (0.3 + i)));
+
+                    g2d.drawString("...", (int) (center_x - (metrics.stringWidth("...") / 2) - (width * 0.20)), (int)(getHeight() * (0.3 + i)));
+                    g2d.drawString("...", (int) (center_x - (metrics.stringWidth("...") / 2) + (width * 0.1)), (int)(getHeight() * (0.3 + i)));
+                    g2d.drawString("...", (int) (center_x - (metrics.stringWidth("...") / 2) + (width * 0.24)), (int)(getHeight() * (0.3 + i)));
+                    g2d.drawString("...", (int) (center_x - (metrics.stringWidth("...") / 2) + (width * 0.3)), (int)(getHeight() * (0.3 + i)));
+                    g2d.drawString("...", (int) (center_x - (metrics.stringWidth("...") / 2) + (width * 0.4)), (int)(getHeight() * (0.3 + i)));
+                    i += 0.06;
+                    counter++;
                 }
             }
-            catch (Exception e) {}
+            catch (InterruptedException e)
+            {
+                return;
+            }
+            catch (Exception e)
+            {
+                this.semaphore1.release();
+            }
             this.semaphore1.release();
         }
     }
@@ -439,19 +490,19 @@ public class MainWindow extends JPanel
 
         //Nagłówek
         g2d.setColor(Color.GRAY);
-        Font font = new Font("Bauhaus 93", Font.CENTER_BASELINE, (int)(width * 0.07));
+        Font font = new Font("Bauhaus 93", Font.PLAIN, (int)(width * 0.07));
         g2d.setFont(font);
         FontMetrics metrics = g2d.getFontMetrics(font);  //do środkowania tekstów
         g2d.drawString("Game Over!", center_x - (metrics.stringWidth("Game Over!") / 2), (int)(getHeight() * 0.2));
 
 
-        font = new Font("Bauhaus 93", Font.CENTER_BASELINE, (int)(width * 0.04));
+        font = new Font("Bauhaus 93", Font.PLAIN, (int)(width * 0.04));
         g2d.setFont(font);
         metrics = g2d.getFontMetrics(font);  //do środkowania tekstów
 
-        String score = "Your score: " + String.valueOf(this.game.getScore());
-        String lines = "Lines: " + String.valueOf(this.game.getLines());
-        String level = "Level: " + String.valueOf(this.game.getLevel());
+        String score = "Your score: " + this.game.getScore();
+        String lines = "Lines: " + this.game.getLines();
+        String level = "Level: " + this.game.getLevel();
 
         g2d.drawString(score, center_x - (metrics.stringWidth(score) / 2), (int)(getHeight() * 0.32));
         g2d.drawString(lines, center_x - (metrics.stringWidth(lines) / 2), (int)(getHeight() * 0.40));
@@ -490,7 +541,7 @@ public class MainWindow extends JPanel
             repaint();
             try
             {
-                Thread.sleep(4);
+                Thread.sleep(5);
             }
             catch (InterruptedException e)
             {
@@ -505,6 +556,7 @@ public class MainWindow extends JPanel
         {
             if(e.getKeyCode() == KeyEvent.VK_ESCAPE)
             {
+                this.sounds.click();
                 this.game.endGame();
                 this.game_status = GameStatus.MENU;
             }
@@ -516,6 +568,7 @@ public class MainWindow extends JPanel
         {
             if(e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_S)
             {
+                this.sounds.click();
                 if(this.mainMenuChose == Menu.START)
                     this.mainMenuChose = Menu.HIGHSCORES;
                 else if(this.mainMenuChose == Menu.HIGHSCORES)
@@ -523,6 +576,7 @@ public class MainWindow extends JPanel
             }
             if(e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W)
             {
+                this.sounds.click();
                 if(this.mainMenuChose == Menu.QUIT)
                     this.mainMenuChose = Menu.HIGHSCORES;
                 else if(this.mainMenuChose == Menu.HIGHSCORES)
@@ -530,6 +584,7 @@ public class MainWindow extends JPanel
             }
             if(e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_SPACE)
             {
+                this.sounds.click();
                 if(this.mainMenuChose == Menu.QUIT)
                     System.exit(0);
                 else if(this.mainMenuChose == Menu.HIGHSCORES)
@@ -541,19 +596,45 @@ public class MainWindow extends JPanel
         else if (this.game_status == GameStatus.GAME_OVER)
         {
             if(e.getKeyCode() == KeyEvent.VK_ENTER)
+            {
+                try
+                {
+                    Highscore highscore = new Highscore(this.semaphore1, this.highscores, this.nickname, this.game.getScore(), this.game.getLevel(), this.game.getLines());
+                    Thread highscore_thread = new Thread(highscore);
+                    highscore_thread.start();
+                    this.have_result = true;
+                }
+                catch (Exception e2) { }
+
                 this.game_status = GameStatus.HIGHSCORES;
+                this.sounds.click();
+            }
             else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
             {
                 if(this.nickname.length() > 0)
                 {
                     this.nickname = this.nickname.substring(0, this.nickname.length() - 1);
+                    this.sounds.click();
                 }
             }
             else if (e.getKeyChar() >= 'A' && e.getKeyChar() <= 'Z' || e.getKeyChar() >= 'a' && e.getKeyChar() <= 'z' || e.getKeyChar() >= '0' && e.getKeyChar() <= '9' || e.getKeyChar() == '-' || e.getKeyChar() == '_')
             {
                 if(this.nickname.length() < 25)
+                {
                     this.nickname += e.getKeyChar();
+                    this.sounds.click();
+                }
             }
+        }
+        else if (this.game_status == GameStatus.HIGHSCORES)
+        {
+            if(e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_SPACE || e.getKeyCode() == KeyEvent.VK_ESCAPE)
+            {
+                this.have_result = false;
+                this.highscores.clear();
+                this.game_status = GameStatus.MENU;
+            }
+
         }
 
     }

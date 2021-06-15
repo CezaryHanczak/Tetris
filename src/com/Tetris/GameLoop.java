@@ -78,21 +78,23 @@ public class GameLoop
 
             try
             {
-                Thread.sleep(5);
+                Thread.sleep(10);
             }
             catch (InterruptedException e)
             {
                 System.out.println("Game Thread Error");
             }
 
+            //przesuwanie Tetrimino w dół co określony czas rundy
             Date date = new Date();
-            if(date.getTime() - this.last_move >= this.round_time)  //przesuwanie Tetrimino w dół co określony czas rundy
+            if(date.getTime() - this.last_move >= this.round_time)
             {
                 this.moveDown();
                 this.last_move = date.getTime();
                 this.clearTetriminos();
             }
 
+            //kończenie gry
             if(this.gameOver)
             {
                 this.is_active = false;
@@ -119,8 +121,11 @@ public class GameLoop
             {
                 for(int x = 0; x < 5; x++)
                 {
-                    if(tetriminos.get(i).block_matrix_cpy[x][y])
+                    if (tetriminos.get(i).block_matrix_cpy[x][y])
+                    {
                         is_clear = false;
+                        break;
+                    }
                 }
             }
             if(is_clear)
@@ -684,7 +689,7 @@ public class GameLoop
         if(this.lines >= this.new_level)
         {
             this.new_level *= 1.5;
-            this.round_time -= this.round_time * 1/(this.level + 2);
+            this.round_time -= this.round_time/(this.level + 2);
             this.score += 1000 * this.level;
             ++this.level;
             this.sounds.levelUp();

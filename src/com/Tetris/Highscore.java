@@ -4,22 +4,46 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.Semaphore;
 
 public class Highscore
     implements Runnable
 {
-    private String url = "jdbc:mysql://jetris.mysql.database.azure.com:3306/highscores?useSSL=false&requireSSL=false&serverTimezone=UTC";
+    private final String url = "jdbc:mysql://jetris.mysql.database.azure.com:3306/highscores?useSSL=false&requireSSL=false&serverTimezone=UTC";
+    private int score;
+    private int level;
+    private int lines;
+    private String nickname;
     private Connection connection;
-    private ArrayList<HighscoreResults> highscoreResults;
+    private boolean send;
+    private final ArrayList<HighscoreResults> highscoreResults;
 
-    private Semaphore semaphore1;
+    private final Semaphore semaphore1;
 
     public Highscore(Semaphore semaphore, ArrayList<HighscoreResults> highscoreResults)
     {
+        this.send = false;
         this.semaphore1 = semaphore;
         this.highscoreResults = highscoreResults;
+        this.score = 0;
+        this.level = 0;
+        this.lines = 0;
+    }
+
+    public Highscore(Semaphore semaphore, ArrayList<HighscoreResults> highscoreResults, String nickname, int score, int level, int lines)
+    {
+        this.send = false;
+        this.semaphore1 = semaphore;
+        this.highscoreResults = highscoreResults;
+        this.nickname = nickname;
+        this.score = score;
+        this.level = level;
+        this.lines = lines;
+        this.send = true;
     }
 
     @Override
@@ -28,6 +52,10 @@ public class Highscore
         boolean connect = this.connect();
         if(connect)
         {
+            if(this.send)
+            {
+                this.sendScore();
+            }
             this.getHighScores();
         }
     }
@@ -51,7 +79,6 @@ public class Highscore
         {
             Statement statement = this.connection.createStatement();
             ResultSet result = statement.executeQuery("SELECT nickname, score, lvl, line, score_date FROM highscores_table ORDER BY score DESC LIMIT 10 ");
-            //ArrayList<HighscoreResults> result_array = new ArrayList<>();
 
             int i = 1;
             while(result.next())
@@ -65,11 +92,26 @@ public class Highscore
 
             statement.close();
             connection.close();
-            return;
         }
-        catch (Exception e)
-        {
-            return;
-        }
+        catch (Exception e) { }
     }
+
+    private void sendScore()
+    {
+        try
+        {
+            Calendar cal = Calendar.getInstance();
+            Date date = cal.getTime();
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            String date_string = format.format(date);
+
+            String values = "'" + this.nickname + "', '" + this.score + "', '" + this.level + "', '" + this.lines + "', '" + date_string + "'";
+
+            Statement statement = this.connection.createStatement();
+            statement.execute("INSERT INTO highscores_table (nickname, score, lvl, line, score_date) VALUES (" + values + ")");
+            statement.close();
+        }
+        catch (Exception e) { }
+    }
+
 }

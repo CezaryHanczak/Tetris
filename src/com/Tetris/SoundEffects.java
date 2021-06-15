@@ -127,7 +127,6 @@ public class SoundEffects
             volume.setValue((float)-10);
             this.bck_music_clip.start();
             this.bck_music_clip.loop(Clip.LOOP_CONTINUOUSLY);
-            return;
         }
         catch (Exception e)
         {
@@ -141,12 +140,10 @@ public class SoundEffects
                 volume.setValue((float)-10);
                 this.bck_music_clip.start();
                 this.bck_music_clip.loop(Clip.LOOP_CONTINUOUSLY);
-                return;
             }
             catch (Exception e2)
             {
                 System.out.println("Music error");
-                return;
             }
         }
     }
@@ -159,12 +156,10 @@ public class SoundEffects
         try
         {
             this.bck_music_clip.stop();
+            this.game_over_clip.setFramePosition(0);
             this.bck_music_clip.close();
         }
-        catch (Exception e)
-        {
-            return;
-        }
+        catch (Exception e) {}
     }
 
     /**

@@ -2,12 +2,12 @@ package com.Tetris;
 
 public class HighscoreResults
 {
-    private int position;
-    private String nickname;
-    private String score;
-    private String level;
-    private String lines;
-    private String date;
+    private final int position;
+    private final String nickname;
+    private final String score;
+    private final String level;
+    private final String lines;
+    private final String date;
 
     HighscoreResults(int position, String nickname, String score, String level, String lines, String date)
     {

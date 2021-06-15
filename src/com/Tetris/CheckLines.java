@@ -140,8 +140,6 @@ public class CheckLines
             int arraySize = tetriminos.size();
             for(int i = 0; i < arraySize; i++)
                 this.game.moveDown(tetriminos.get(i));
-            //for(int i = arraySize - 1; i >= 0; i--)
-            //    this.game.moveDown(tetriminos.get(i));
 
             try
             {
