@@ -81,7 +81,7 @@ public class SoundEffects
     }
 
     /**
-     * Funkcja otwiera plik dzwiękowy i przypisuje go do odpowiedniego obiektu Clip
+     * Funkcja otwiera plik dzwiękowy i zwraca utworzony obiekt Clip
      *
      * @param name Nazwa pliku dzwiękowego
      * @return Obiekt typu <bold>Clip</bold> z otwrtym efektem dzwiękowym

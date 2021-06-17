@@ -459,7 +459,8 @@ public class GameLoop
      */
     public void keyPressed(int keyCode)
     {
-        switch (keyCode) {
+        switch (keyCode)
+        {
             case KeyEvent.VK_RIGHT:
             case KeyEvent.VK_D:
                 moveRight();

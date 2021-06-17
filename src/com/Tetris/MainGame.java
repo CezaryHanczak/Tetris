@@ -42,7 +42,7 @@ public class MainGame extends JFrame
 
         try
         {
-            ImageIcon img = new ImageIcon(Objects.requireNonNull(getClass().getResource("/img/icon40.png"))); //ścieżka bo spakwowaniu do Jar
+            ImageIcon img = new ImageIcon(Objects.requireNonNull(getClass().getResource("/img/icon40.png"))); //ścieżka bo spakowaniu do Jar
             setIconImage(img.getImage());
         }
         catch (Exception e){}

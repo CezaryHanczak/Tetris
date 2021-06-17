@@ -21,6 +21,7 @@ public class Highscore
     private Connection connection;
     private boolean send;
     private final ArrayList<HighscoreResults> highscoreResults;
+    private final int checksum;
 
     private final Semaphore semaphore1;
 
@@ -32,6 +33,7 @@ public class Highscore
         this.score = 0;
         this.level = 0;
         this.lines = 0;
+        this.checksum = 0;
     }
 
     public Highscore(Semaphore semaphore, ArrayList<HighscoreResults> highscoreResults, String nickname, int score, int level, int lines)
@@ -44,6 +46,8 @@ public class Highscore
         this.level = level;
         this.lines = lines;
         this.send = true;
+        this.checksum = (this.level * this.score * this.lines + this.nickname.length()) / this.nickname.length();
+        System.out.println(this.checksum);
     }
 
     @Override
@@ -78,11 +82,14 @@ public class Highscore
         try
         {
             Statement statement = this.connection.createStatement();
-            ResultSet result = statement.executeQuery("SELECT nickname, score, lvl, line, score_date FROM highscores_table ORDER BY score DESC LIMIT 10 ");
+            ResultSet result = statement.executeQuery("SELECT nickname, score, lvl, line, score_date, time FROM highscores_table ORDER BY score DESC LIMIT 20");
 
             int i = 1;
-            while(result.next())
+            while(result.next() && i <= 10)
             {
+                if((result.getInt("lvl") * result.getInt("score") * result.getInt("line") + result.getString("nickname").length()) / result.getString("nickname").length() != result.getInt("time"))
+                    continue;
+
                 HighscoreResults temp = new HighscoreResults(i, result.getString("nickname"), result.getString("score"), result.getString("lvl"), result.getString("line"), result.getString("score_date"));
                 this.semaphore1.acquire();
                 this.highscoreResults.add(temp);
@@ -93,7 +100,14 @@ public class Highscore
             statement.close();
             connection.close();
         }
-        catch (Exception e) { }
+        catch (Exception e)
+        {
+            try
+            {
+                connection.close();
+            }
+            catch (Exception e2) { }
+        }
     }
 
     private void sendScore()
@@ -104,11 +118,10 @@ public class Highscore
             Date date = cal.getTime();
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             String date_string = format.format(date);
-
-            String values = "'" + this.nickname + "', '" + this.score + "', '" + this.level + "', '" + this.lines + "', '" + date_string + "'";
+            String values = "'" + this.nickname + "', '" + this.score + "', '" + this.level + "', '" + this.lines + "', '" + date_string + "', '" + this.checksum  + "'";
 
             Statement statement = this.connection.createStatement();
-            statement.execute("INSERT INTO highscores_table (nickname, score, lvl, line, score_date) VALUES (" + values + ")");
+            statement.execute("INSERT INTO highscores_table (nickname, score, lvl, line, score_date, time) VALUES (" + values + ")");
             statement.close();
         }
         catch (Exception e) { }

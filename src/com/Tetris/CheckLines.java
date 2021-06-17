@@ -17,7 +17,14 @@ public class CheckLines
     private final int size_x;
     private final Semaphore semaphore1;
 
-
+    /**
+     * Inicjalizacja klasy
+     * @param size_x szerokość planszy
+     * @param size_y wysokość planszy
+     * @param game obiekt gry do wywołania odpwiednich metod
+     * @param sounds obiekt do obsługi dzwięku
+     * @param semaphore semafor blokujący jednoczesny dostęp do tablicy Tetrimino
+     */
     public CheckLines(int size_x, int size_y, GameLoop game, SoundEffects sounds, Semaphore semaphore)
     {
         this.size_x = size_x;
@@ -27,6 +34,11 @@ public class CheckLines
         this.semaphore1 = semaphore;
     }
 
+    /**
+     * Wątek sprawdzający wysąpienie pełnej linii.
+     * Jeśli taka występuje usuwa ją, dodaje punkty i dzieli odpowiednie bloki.
+     * Dba również o przesuwanie wszystkich bloków w dół
+     */
     @Override
     public void run()
     {
