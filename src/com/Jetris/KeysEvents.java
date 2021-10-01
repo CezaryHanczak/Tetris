@@ -1,4 +1,4 @@
-package com.Tetris;
+package com.Jetris;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;

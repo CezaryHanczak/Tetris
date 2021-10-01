@@ -6,8 +6,8 @@
         <option name="yGuardJar" value="C:\Users\Czarek\Desktop\Sztudia\Sem4\PO2\yguard-bundle-3.0.0\lib\yguard-3.0.0.jar" />
         <option name="inFile" value="C:\Users\Czarek\Desktop\Sztudia\Sem4\PO2\Tetris\out\artifacts\Tetris_jar\Tetris.jar" />
         <option name="outFile" value="C:\Users\Czarek\Desktop\Sztudia\Sem4\PO2\Tetris\out\artifacts\Tetris_jar\TetrisOB.jar" />
-        <option name="mainclass" value="com.Tetris.Main" />
-        <option name="namingScheme" value="best" />
+        <option name="mainclass" value="com.Jetris.Main" />
+        <option name="namingScheme" value="mix" />
         <option name="jarConfig">
           <JarConfig>
             <option name="jarEntries">

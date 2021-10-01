@@ -1,4 +1,4 @@
-package com.Tetris;
+package com.Jetris;
 
 import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
@@ -74,10 +74,11 @@ public class CheckLines
                         }
                     }
                 }
-
+                boolean deleted = false;
                 //usunięcie bloków na linii
-                if(blocks == this.size_x - 2)
+                if(blocks >= this.size_x - 2)
                 {
+                    deleted = true;
                     this.game.addLines(1);
                     this.game.addScore(200);
                     int size = tetriminos.size();
@@ -143,15 +144,16 @@ public class CheckLines
                             }
                         }
                     }
-                    this.sounds.line();
                 }
+
+                if(deleted)
+                    this.sounds.line();
                 blocks = 0;
             }
             semaphore1.release();
 
-            int arraySize = tetriminos.size();
-            for(int i = 0; i < arraySize; i++)
-                this.game.moveDown(tetriminos.get(i));
+            for(Tetrimino tetrimino:tetriminos)
+                this.game.moveDown(tetrimino);
 
             try
             {

@@ -1,4 +1,4 @@
-package com.Tetris;
+package com.Jetris;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -12,12 +12,14 @@ import java.io.File;
 public class SoundEffects
 {
     private Clip bck_music_clip;
+    boolean bck_music_plays;
     private Clip game_over_clip;
     private Clip new_level_clip;
     private Clip line_clip;
     private Clip rotate_clip;
     private Clip move_down_clip;
     private Clip menu_click_clip;
+
 
     /**
      * Inizjalizacji i utworzenie klipów dzwiękowych do efektów jeśli to możliwe
@@ -91,7 +93,7 @@ public class SoundEffects
     {
         try
         {
-            AudioInputStream audioInput = AudioSystem.getAudioInputStream(getClass().getResource("/sounds/" + name));  //Otwarcie pliku w przypadku spakowania aplikacji do JAR
+            AudioInputStream audioInput = AudioSystem.getAudioInputStream(getClass().getResource("/sounds/" + name)); //Otwarcie pliku w przypadku spakowania aplikacji do JAR
             Clip clip = AudioSystem.getClip();
             clip.open(audioInput);
             return clip;
@@ -116,7 +118,7 @@ public class SoundEffects
     /**
      * Funkcja otwiera i zapętla plik dzwiękowy aż do zastopowania go funkcją <bold>SoundEffects.stopBackgroundMusic()</bold>
      */
-    public void playBackgroundMusic()
+    void playBackgroundMusic()
     {
         try
         {
@@ -127,6 +129,7 @@ public class SoundEffects
             volume.setValue((float)-10);
             this.bck_music_clip.start();
             this.bck_music_clip.loop(Clip.LOOP_CONTINUOUSLY);
+            this.bck_music_plays = true;
         }
         catch (Exception e)
         {
@@ -140,6 +143,7 @@ public class SoundEffects
                 volume.setValue((float)-10);
                 this.bck_music_clip.start();
                 this.bck_music_clip.loop(Clip.LOOP_CONTINUOUSLY);
+                this.bck_music_plays = true;
             }
             catch (Exception e2)
             {
@@ -151,21 +155,36 @@ public class SoundEffects
     /**
      * Funkcja zatrzymuje muzykę
      */
-    public void stopBackgroundMusic()
+    void stopBackgroundMusic()
     {
         try
         {
             this.bck_music_clip.stop();
             this.game_over_clip.setFramePosition(0);
             this.bck_music_clip.close();
+            this.bck_music_plays = false;
         }
         catch (Exception e) {}
+    }
+
+    void switchBackgroundMusic()
+    {
+        if(this.bck_music_plays)
+        {
+            this.bck_music_clip.stop();
+            this.bck_music_plays = false;
+        }
+        else
+        {
+            this.bck_music_clip.start();
+            this.bck_music_plays = true;
+        }
     }
 
     /**
      * Funkcja odtawrza jednokrotnie efekt dzwiękowy
      */
-    public void game_over()
+    void game_over()
     {
         try
         {
@@ -182,7 +201,7 @@ public class SoundEffects
     /**
      * Funkcja odtawrza jednokrotnie efekt dzwiękowy
      */
-    public void click()
+    void click()
     {
         try
         {
@@ -199,7 +218,7 @@ public class SoundEffects
     /**
      * Funkcja odtawrza jednokrotnie efekt dzwiękowy
      */
-    public void rotate()
+    void rotate()
     {
         try
         {
@@ -216,7 +235,7 @@ public class SoundEffects
     /**
      * Funkcja odtawrza jednokrotnie efekt dzwiękowy
      */
-    public void levelUp()
+    void levelUp()
     {
         try
         {
@@ -233,7 +252,7 @@ public class SoundEffects
     /**
      * Funkcja odtawrza jednokrotnie efekt dzwiękowy
      */
-    public void line()
+    void line()
     {
         try
         {
@@ -250,7 +269,7 @@ public class SoundEffects
     /**
      * Funkcja odtawrza jednokrotnie efekt dzwiękowy
      */
-    public void moveDown()
+    void moveDown()
     {
         try
         {

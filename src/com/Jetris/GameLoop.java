@@ -1,4 +1,4 @@
-package com.Tetris;
+package com.Jetris;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -25,6 +25,7 @@ public class GameLoop
     private final Semaphore semaphore1;
 
     private ArrayList<Tetrimino> tetriminos;
+    boolean moveDownAtOnceFlag;
 
     public GameLoop(int size_x, int size_y, SoundEffects sounds, Semaphore semaphore)
     {
@@ -42,6 +43,7 @@ public class GameLoop
         this.tetriminos = new ArrayList<>();    //lista bloków na planszy
         this.sounds = sounds;
         this.semaphore1 = semaphore;
+        this.moveDownAtOnceFlag = false;
 
         CheckLines checkLines = new CheckLines(this.size_x, this.size_y, this, this.sounds, this.semaphore1);
         Thread checkLinesThread = new Thread(checkLines);
@@ -78,16 +80,16 @@ public class GameLoop
 
             try
             {
-                Thread.sleep(10);
+                Thread.sleep(5);
             }
             catch (InterruptedException e)
             {
                 System.out.println("Game Thread Error");
             }
 
-            //przesuwanie Tetrimino w dół co określony czas rundy
+            //przesuwanie Tetrimino w dół co określony czas
             Date date = new Date();
-            if(date.getTime() - this.last_move >= this.round_time)
+            if(date.getTime() - this.last_move >= this.round_time  || (this.moveDownAtOnceFlag && date.getTime() - this.last_move >= 5))
             {
                 this.moveDown();
                 this.last_move = date.getTime();
@@ -138,7 +140,7 @@ public class GameLoop
      * Funkcja sprawdza czy pod jakimkolwiek elemencie z obecnego Tetrimino jest spód planszy lub część innego Tetrimino.
      * Zwraca <code>true</code> jeśli tak, <code>false</code> w przeciwnym wypadku
      */
-    private boolean checkCollision()
+    boolean checkCollision()
     {
 
         for(int y = 0; y < 5; y++)
@@ -182,7 +184,7 @@ public class GameLoop
                         }
                     }
                 }
-                this.semaphore1.release();
+               this.semaphore1.release();
             }
         }
         return false;
@@ -655,6 +657,7 @@ public class GameLoop
             this.is_active = false;
             Tetrimino temp = this.active_tetrimino;
             this.tetriminos.add(temp);
+            this.moveDownAtOnceFlag = false;
         }
         else
         {
@@ -678,8 +681,11 @@ public class GameLoop
 
     private void moveDownAtOnce()
     {
-        while(!checkCollision())
-            moveDown();
+        this.moveDownAtOnceFlag = true;
+        //while(!this.checkCollision())
+        //{
+        //    this.moveDown();
+        //}
         this.sounds.moveDown();
         this.last_move = 0;
         this.addScore(100);

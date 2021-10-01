@@ -1,4 +1,4 @@
-package com.Tetris;
+package com.Jetris;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,7 +13,7 @@ import java.util.concurrent.Semaphore;
 public class Highscore
     implements Runnable
 {
-    private final String url = "jdbc:mysql://jetris.mysql.database.azure.com:3306/highscores?useSSL=false&requireSSL=false&serverTimezone=UTC";
+    private final String url = "jdbc:mysql://sql4.freesqldatabase.com:3306/sql4441640?useSSL=false&requireSSL=false&serverTimezone=UTC";
     private int score;
     private int level;
     private int lines;
@@ -22,10 +22,11 @@ public class Highscore
     private boolean send;
     private final ArrayList<HighscoreResults> highscoreResults;
     private final int checksum;
+    private MainWindow.HighscoreMode highscoreMode;
 
     private final Semaphore semaphore1;
 
-    public Highscore(Semaphore semaphore, ArrayList<HighscoreResults> highscoreResults)
+    public Highscore(Semaphore semaphore, ArrayList<HighscoreResults> highscoreResults, MainWindow.HighscoreMode highscoreMode)
     {
         this.send = false;
         this.semaphore1 = semaphore;
@@ -34,9 +35,10 @@ public class Highscore
         this.level = 0;
         this.lines = 0;
         this.checksum = 0;
+        this.highscoreMode = highscoreMode;
     }
 
-    public Highscore(Semaphore semaphore, ArrayList<HighscoreResults> highscoreResults, String nickname, int score, int level, int lines)
+    public Highscore(Semaphore semaphore, ArrayList<HighscoreResults> highscoreResults, String nickname, int score, int level, int lines, MainWindow.HighscoreMode highscoreMode)
     {
         this.send = false;
         this.semaphore1 = semaphore;
@@ -46,8 +48,8 @@ public class Highscore
         this.level = level;
         this.lines = lines;
         this.send = true;
+        this.highscoreMode = highscoreMode;
         this.checksum = (this.level * this.score * this.lines + this.nickname.length()) / this.nickname.length();
-        System.out.println(this.checksum);
     }
 
     @Override
@@ -68,7 +70,7 @@ public class Highscore
     {
         try
         {
-            this.connection = DriverManager.getConnection(url, "jetris_game@jetris", "3WaFN5f^wc7R%wFViokpt24H");
+            this.connection = DriverManager.getConnection(url, "sql4441640", "wyfLC8Qm3E");
             return true;
         }
         catch (Exception e)
@@ -82,7 +84,27 @@ public class Highscore
         try
         {
             Statement statement = this.connection.createStatement();
-            ResultSet result = statement.executeQuery("SELECT nickname, score, lvl, line, score_date, time FROM highscores_table ORDER BY score DESC LIMIT 20");
+            ResultSet result;
+            if(this.highscoreMode == MainWindow.HighscoreMode.ALL_TIME)
+            {
+                result = statement.executeQuery("SELECT nickname, score, lvl, line, score_date, time FROM jetris ORDER BY score DESC LIMIT 20");
+            }
+            else if(this.highscoreMode == MainWindow.HighscoreMode.LAST30)
+            {
+                result = statement.executeQuery("SELECT nickname, score, lvl, line, score_date, time FROM jetris WHERE score_date >= date_add(curdate(), INTERVAL -1 MONTH) ORDER BY score DESC LIMIT 20");
+            }
+            else if(this.highscoreMode == MainWindow.HighscoreMode.LAST7)
+            {
+                result = statement.executeQuery("SELECT nickname, score, lvl, line, score_date, time FROM jetris WHERE score_date >= date_add(curdate(), INTERVAL -7 DAY) ORDER BY score DESC LIMIT 20");
+            }
+            else
+            {
+                result = statement.executeQuery("SELECT nickname, score, lvl, line, score_date, time FROM jetris ORDER BY score DESC LIMIT 20");
+            }
+
+            this.semaphore1.acquire();
+            this.highscoreResults.clear();
+            this.semaphore1.release();
 
             int i = 1;
             while(result.next() && i <= 10)
@@ -100,8 +122,17 @@ public class Highscore
             statement.close();
             connection.close();
         }
+        catch (InterruptedException e)
+        {
+            try
+            {
+                connection.close();
+            }
+            catch (Exception e2) { }
+        }
         catch (Exception e)
         {
+            this.semaphore1.release();
             try
             {
                 connection.close();
@@ -121,7 +152,7 @@ public class Highscore
             String values = "'" + this.nickname + "', '" + this.score + "', '" + this.level + "', '" + this.lines + "', '" + date_string + "', '" + this.checksum  + "'";
 
             Statement statement = this.connection.createStatement();
-            statement.execute("INSERT INTO highscores_table (nickname, score, lvl, line, score_date, time) VALUES (" + values + ")");
+            statement.execute("INSERT INTO jetris (nickname, score, lvl, line, score_date, time) VALUES (" + values + ")");
             statement.close();
         }
         catch (Exception e) { }

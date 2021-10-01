@@ -1,6 +1,6 @@
 //Tetris
 
-package com.Tetris;
+package com.Jetris;
 
 public class Main
 {

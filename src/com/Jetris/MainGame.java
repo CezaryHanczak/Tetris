@@ -1,4 +1,4 @@
-package com.Tetris;
+package com.Jetris;
 
 import javax.swing.*;
 import java.util.Objects;
@@ -10,10 +10,13 @@ import java.util.concurrent.Semaphore;
 public class MainGame extends JFrame
 {
     private final Semaphore semaphore1 = new Semaphore(1);
+    boolean fullscreen;
+
     public MainGame()
     {
         initUI();
     }
+
 
     /**
      * Inicjalizacjia okna, stworzenie obiektów do obsługi dzwięków, stworzenie panelu do rysowania,
@@ -22,16 +25,17 @@ public class MainGame extends JFrame
     private void initUI()
     {
         SoundEffects sounds = new SoundEffects();
-        MainWindow main_window = new MainWindow(12, 20, sounds, this.semaphore1);
+        MainWindow main_window = new MainWindow(12, 20, sounds, this.semaphore1, this);
         add(main_window);
         addKeyListener(new KeysEvents( main_window));
         setSize(800, 800);
-        setTitle("Tetris");
+        setTitle("Jetris");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        //setExtendedState(JFrame.MAXIMIZED_BOTH);
-        //setUndecorated(true);
+        setExtendedState(JFrame.NORMAL);
+        setUndecorated(false);
+        this.fullscreen = false;
 
         try
         {
@@ -46,5 +50,26 @@ public class MainGame extends JFrame
             setIconImage(img.getImage());
         }
         catch (Exception e){}
+    }
+
+    void toggleFullscreen()
+    {
+        if(this.fullscreen)
+        {
+            setExtendedState(JFrame.NORMAL);
+            dispose();
+            setUndecorated(false);
+            setVisible(true);
+            this.fullscreen = false;
+        }
+        else
+        {
+            setExtendedState(JFrame.MAXIMIZED_BOTH);
+            dispose();
+            setUndecorated(true);
+            setSize(800, 800);
+            setVisible(true);
+            this.fullscreen = true;
+        }
     }
 }

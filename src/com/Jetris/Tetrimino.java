@@ -1,4 +1,4 @@
-package com.Tetris;
+package com.Jetris;
 
 import java.util.Date;
 import java.util.Random;
